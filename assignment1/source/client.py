@@ -39,6 +39,7 @@ class Client:
     def help(self):
         return """
 Client usage options:
+/help to print this message
 /ping
 /calc <num1> <operation> <num2>
 /echo <text to echo>
@@ -83,8 +84,10 @@ Usage examples:
                 else:
                     response = "Too large command, max %d chars" % self.BUFFER_SIZE
 
+            elif line.upper() == '/HELP':
+                response = self.help()
             else:
-               response = 'Unkown command!' + self.help()
+               response = 'Unkown command! use /help to see valid commands'
             sys.stdout.write(response + '\n')
 
         self.socket.close()
