@@ -27,11 +27,11 @@ class Client:
 
         #if calc command
         if command[0:6].upper() == '/CALC ':
-            pass
+            return "CALC " + command[6:]
 
         #if echo command
         if len(command) > 6 and command[:6].upper() == '/ECHO ':
-            pass
+            return "ECHO " + command[6:]
 
         #return None if the others fail => command not well formed
         return None
@@ -73,24 +73,21 @@ Usage examples:
             # /QUIT does not go to the server , just breaks the loop
             if line.upper() == '/QUIT' or line == '':
                 print 'closing connection...'
-                self.socket.close()
                 break
             request = self.parse_command(line) #parse the user input and check if it is well formed
 
-            if request is not None:#if well formed request
-               #Send the request to the server and recevice the response
+            if request is not None: #if well formed request
+                if len(request) <= self.BUFFER_SIZE:
+                    self.socket.send(request);
+                    response = self.socket.recv(self.BUFFER_SIZE)
+                else:
+                    response = "Too large command, max %d chars" % self.BUFFER_SIZE
 
-               # TODO: Sanity check on size
-               self.socket.send(request);
-               response = self.socket.recv(BUFFER_SIZE)
             else:
                response = 'Unkown command!' + self.help()
             sys.stdout.write(response + '\n')
 
-
-        #close the socket
-
-
+        self.socket.close()
         print 'Connection closed. Bye!'
 
 
