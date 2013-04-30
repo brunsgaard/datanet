@@ -5,40 +5,41 @@ import errno
 
 class Client:
     BUFFER_SIZE = 1024
-    def __init__(self, port=50000, serverip='localhost'): 
+    def __init__(self, port=50000, serverip='localhost'):
         """
         Initialize the variables required by the client
         """
         self.serverip = serverip
         self.port = port
-        
+
         self.socket = None #use this variable as the client socket
-        
+
         #Initialize the socket
-                   
-    def parse_command(self, command):   
+
+    def parse_command(self, command):
         """
-        Use this method to check that the user input is formatted correctly so that 
+        Use this method to check that the user input is formatted correctly so that
         only valid requests are sent to the server
         """
         #if ping command
         if command.upper().strip() == '/PING':
-            pass
+            return 'PING'
 
         #if calc command
         if command[0:6].upper() == '/CALC ':
-            pass
-        
+            return "CALC " + command[6:]
+
         #if echo command
         if len(command) > 6 and command[:6].upper() == '/ECHO ':
-            pass
-           
+            return "ECHO " + command[6:]
+
         #return None if the others fail => command not well formed
         return None
 
     def help(self):
         return """
 Client usage options:
+/help to print this message
 /ping
 /calc <num1> <operation> <num2>
 /echo <text to echo>
@@ -61,9 +62,11 @@ Usage examples:
         """
         sys.stdout.write(self.help())
         running = True
-        
+
         #connect the client
-        
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.connect( (self.serverip, self.port) )
+
         while running:
             # read from keyboard
             line = raw_input('>')
@@ -73,18 +76,21 @@ Usage examples:
                 print 'closing connection...'
                 break
             request = self.parse_command(line) #parse the user input and check if it is well formed
-            
-            if request is not None:#if well formed request
-               #Send the request to the server and recevice the response
-               
+
+            if request is not None: #if well formed request
+                if len(request) <= self.BUFFER_SIZE:
+                    self.socket.send(request);
+                    response = self.socket.recv(self.BUFFER_SIZE)
+                else:
+                    response = "Too large command, max %d chars" % self.BUFFER_SIZE
+
+            elif line.upper() == '/HELP':
+                response = self.help()
             else:
-               response = 'Unkown command!' + self.help()
+               response = 'Unkown command! use /help to see valid commands'
             sys.stdout.write(response + '\n')
 
-
-        #close the socket
-
-            
+        self.socket.close()
         print 'Connection closed. Bye!'
 
 
@@ -94,4 +100,4 @@ if __name__ == '__main__':
     except Exception as e:
         print "error"
         print e
-        
+
