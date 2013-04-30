@@ -1,0 +1,297 @@
+Dette dokument udgør opgavesættet for den ordinære eksamen i kurset
+``Objektorienteret programmering og design'', blok 1, 2012. Det består af
+\pageref{LastPage} nummererede sider. Dokumentet offentliggøres mandag den 14.
+januar kl. 9:00 på kursets hjemmeside via KU's kursusadministrationssystem
+Absalon.
+
+% \subsection{Afleveringsfrist}
+
+%% The submission deadline is {\bf Friday the 18th of January, 2013, 14:00 CET}.
+%% Resubmission is \emph{not} possible, and the deadline \emph{cannot} be
+%% extended.
+
+\section{Aflevering}
+
+%% Hand in your solution in digital form, under the folder ``Exam'' on Absalon.
+%% You should hand in a single archive file (jar, zip, tar, etc.). The actual
+%% structure of the desired archive is explicitly stated at the end of the
+%% assignment text. The name of the archive should be your alumni id, e.g.
+%% \mono{abc123.zip}.
+
+Besvarelsen skal afleveres senest \textbf{fredag den 18. januar kl. 14:00}. Der
+vil \emph{ikke} være mulighed for genaflevering, og afleveringsfristen kan
+\emph{ikke} udskydes.
+
+\subsubsection{Procedure}
+
+Besvarelsen afleveres i digital form, under mappen ``Eksamen'' på Absalon. Du
+bedes aflevere hele løsningen i en enkelt arkivfil (jar, zip, tar eller
+lignende). Arkivfilen skal navngives efter dit KU alumne id, f.eks.
+\mono{abc123.zip}. Arkivfilens indhold er beskrevet i sektion
+\ref{sec:indhold}.
+
+%% Please make sure that you hand in your \emph{source code} and \emph{not} java
+%% bytecode. It is always a good idea to check that all of your files have been
+%% uploaded correctly by downloading them again and browsing them
+%% yourself.
+
+%% In the unfortunate case that the KU systems are down, send your
+%% solution directly to \mono{oleks@diku.dk}. The aforementioned deadline holds
+%% regardless.
+
+Skulle KUs systemer være nede i forbindelse med afleveringsfristen,
+bedes du sende din løsning direkte til
+\mono{oleks@diku.dk}. Afleveringsfristen som angivet ovenfor ændres ikke.
+
+\subsubsection{Indhold}
+
+\label{sec:indhold}
+
+Arkivfilen skal indeholde:
+
+\begin{itemize}
+
+\item En mappe \texttt{./src}, med al din kildetekst.
+
+\item En fil \texttt{./assessment.txt} hvor du udfører en vurdering af din
+løsning for hver opgave (mere om dette under selve opgaverne).
+
+\end{itemize}
+
+Det forventes at kildetekstens mappestruktur svarer til den erklærede
+pakkestruktur. F.eks. hvis der findes en klasse,
+\texttt{spreadsheet.command.Exit}, så forefindes der også en fil
+\texttt{./src/spreadsheet/command/Exit.java} med erklæringen \texttt{package
+spreadsheet.command} i toppen af filen.
+
+Al kildetekst forventes at være kompatibelt med Java\texttrademark~SE
+Development Kit 7, altså version 1.7.0.
+
+Det forventes endvidere at koden generelt er dokumenteret med f.eks. javadoc
+kommentarer\footnotemark. Mere specifikt, forventer vi at at alle nye pakker og
+klasser er dokumenteret således at en individ uvidende om dette dokument kan
+finde rundt i kildekoden. Det er dog ikke strengt taget et krav at du bruger
+javadoc til dette. Alle kommentarer og alt kildekode skal være på engelsk.
+
+\footnotetext{javadoc dokumentation:
+\url{http://docs.oracle.com/javase/7/docs/technotes/tools/solaris/javadoc.html\#description}.}
+
+Det forventes ikke at der rettes fejl i den udleverede kildekode, men der skal
+argumenteres for at fejlen er i den udleverede kildekode og ikke hos jer selv,
+hvis det f.eks. forhindrer jeres afprøvning i at virke som forventet.
+
+Inden du afleverer opgaven bør du venligst sikre dig, at din arkivfil
+indeholder alle de forventede filer. Det er især vigtigt at tjekke at
+arkivfilen indeholder \emph{kildetekst} og altså \emph{ikke} Java bytecode. Det
+er desuden altid en god idé at sikre sig at dine filer er blevet lagt op
+korrekt, ved at hente arkivfilen fra Absalon igen og kigge indholdet igennem.
+
+\subsubsection{Evaluering}
+
+Det forventes at du er i stand til at evaluere kvaliteten af din løsning. Evaluering skal ske i form af et par korte afsnit for hver opgave i opgaveteksten i den supplerende tekstfil, \texttt{./assessment.txt}.
+
+Evaluering kan f.eks. udføres vha. ``unit testing''. Hvis du benytter dette, forventer vi at du bruger JUnit frameworket til formålet. Der eksister endvidere en skelet
+JUnit testfil for hver opgave, nemlig
+
+\begin{enumerate}
+
+\item \texttt{spreadsheet.IfThenElseTest};
+
+\item \texttt{spreadsheet.RangeTest};
+
+\item \texttt{spreadsheet.UndoTest};
+
+\item \texttt{spreadsheet.CopyPastTest}; og
+
+\item \texttt{gui.PlotTest}.
+
+\end{enumerate}
+
+\subsection{Bedømmelse}
+
+Besvarelsen bedømmes efter 7-trinsskalaen ud fra en samlet bedømmelse af,
+hvorvidt læringsmålene for kurset er opfyldt (se kursusbeskrivelsen).
+Besvarelsen bedømmes indenfor 3 uger efter afleveringsfristen, med ekstern
+censur.
+
+\subsection{Selvstændighed i besvarelsen og eksamenssnyd}
+
+Opgavesættet besvares \emph{individuelt}. Det er kun tilladt at stille
+opklarende spørgsmål til opgavernes fortolkning, den udleverede kildekode,
+eller Java bibliotekkerne til instruktorerne under instruktorvagtordningen
+eller på kursets elektroniske diskussionsforum. Spørgsmål på forummet må ikke
+indeholde programtekst. Det er \emph{ikke} tilladt for studerende på kurset at
+\emph{besvare} spørgsmål på forum --- det er udelukkende instruktorer og
+undervisere, der må det. Instruktorerne må endvidere frit redigere indlæg på
+forummet hvis de finder dem for specifikke eller på anden vis upassende.
+
+Det er ikke tilladt at diskutere opgavernes fortolkning eller indhold med
+andre end de herover nævnte.
+
+Det er ikke tilladt overhovedet at diskutere besvarelse af opgaverne, herunder
+afprøvningstilfælde, løsningsmetoder, algoritmer eller konkret programtekst.
+Specifikt er følgende ikke tilladt i eksamensperioden, og enhver overtrædelse
+vil resultere i indkaldelse til mundtlig overhøring samt overdragelse af sagen
+til studielederen til behandling under gældende regler for eksamenssnyd:
+
+\begin{itemize}
+
+\item At vise enhver del af sin besvarelse til andre, herunder specielt
+personer, som følger kurset.
+
+\item At vise enhver del af opgavesættet til personer, som ikke er tilknyttet
+kurset. Herunder at lægge (dele af) opgaveformuleringer online (fora og
+chatrooms inklusive) andetsteds end kursets diskussionsforum.
+
+\item At diskutere opgavesættet eller dets fortolkning med andre personer,
+udover de herover nævnte undtagelser.
+
+\item At efterlade opgavesættet eller noter/kladder til ens egen besvarelse
+uden opsyn på DIKU. Dette inkluderer at gå fra en ulåst datamat selv i kortere
+tid, smide udskrifter i papirkurve på DIKU, eller udskrive opgavesæt og
+løsninger på DIKUs printere, da andre har adgang til disse. Vi kan ikke
+kontrollere en sådan adfærd, men hvis en anden persons aflevering ligner din,
+så vil I begge blive betragtet som ansvarlige for kopieringen.
+
+\item At diskutere med andre eller afskrive fra andre dele eller hele
+besvarelser af opgaver fra eksamenssættet.
+
+\item At efterlyse løsninger fra andre.
+
+\item At bruge i øvrigt tilladeligt skriftligt eller mundtligt materiale ud
+over kursets undervisningsmateriale uden henvisning til kilden (f.eks.
+oplysninger fra Wikipedia, Google Scholar eller lignende).
+
+\end{itemize}
+
+Brugen af \emph{skriftligt} materiale fra offentligt tilgængelige kilder er
+\emph{tilladt} under forudsætning af, at kilden var tilgængelig før eksamens
+start, og at kilden angives i besvarelsen. For kilder på Internettet skal
+komplet URL angives.
+
+Det indskærpes, at alle besvarelser vil blive underlagt både elektronisk og
+menneskelig plagiatkontrol. Denne plagiatkontrol er stærk nok til at genkende
+ligheder i kode selv om der er lavet forsøg på at skjule denne lighed med
+betydningsbevarende omskrivninger i koden.
+
+Hvis eksaminatorer, studieleder og dekan finder det sandsynligt, at disse
+regler er overtrådt, så er konsekvensen som minimum, at eksamensresulatet
+bliver ændret til -3, og i særligt grove tilfælde kan eksaminanden blive
+bortvist fra universitetet.
+
+\subsection{Instruktorvagtordningen}
+
+Der er mulighed for at spørge en instruktor direkte i DIKU's kantine. Der er en
+vagt mellem 10 og 13 og mellem 14 og 17 hver dag under eksamen. Fredag er der
+kun vagt mellem 10 og 14. Vagtplanen er lagt op ved siden af opgaveteksten på
+Absalon.  Bemærk, at der kan forekomme ændringer i vagtplanen.
+
+Instruktoren på vagt vil ellers være nemt identificerbar i kantinen. Forstyr
+venligst ikke instruktorene udenfor deres vagter, da de selv har eksamen.
+
+Bemærk også at i visse tilfælde ville jeres medstuderende have gavn af
+at få jeres spørgsmål besvaret på diskussionsforummet.
+
+\subsection{Tema}
+
+%% The theme of the exam is to extend thespreadsheet application, ``Regneark''.
+%% This is the application we have been developing gradually throughout the course.
+%% As an initial code base, we provide a reference implementation, incorporating
+%% all of the work done throughout the course. You will find a description of this
+%% implementation below.
+
+Formålet med eksamenssættet er at udvide jeres regnearksprogram fra
+ugeopgaverne, kaldet ``Regneark''. Som udgangspunkt for løsningen vil der
+stilles en færdig implementation af de hidtidige opgaver til rådighed. Det er
+tilladt, men ikke anbefalet at bruge ens eget løsning til ugeopgaverne som
+grundlag. Den udleverede implementation beskrives i nærmere detaljer nedenfor.
+
+\subsection{Opgaver}
+
+%% The exam consists of five mandatory tasks. We make no statement about the
+%% weight of each task towards your final grade.  Indeed, your final grade
+%% will depend on your ability to meet the learning objectives\footnotemark, and
+%% not necessarily solve all of the exrcises in the exam.
+
+Der vil ikke forekomme en vægtning af de individuelle opgaver, men en
+helhedsvurdering af opgaven. Din samlede karakter vil i større grad
+afspejle din evne til at møde læringsmålene for kurset\footnotemark,
+end om du nødvendigvis kan løse alle opgaverne i eksamenssættet.
+
+\footnotetext{OOPD Kursusbeskrivelse: \url{http://sis.ku.dk/kurser/viskursus.aspx?knr=142243}.}
+
+%% The task descriptions give an outline, but are deliberately incomplete. We
+%% expect \emph{you} to fill in the blanks. For instance, we may ask you to add a
+%% particular abstract method to a particular abstract base class. You should
+%% hereby understand that it is up to you to figure out how to implement the
+%% functionality in the concrete subclasses. A short task description does not
+%% necessarily mean a simpler task, and vice versa.
+
+Opgavebeskrivelserne vil give dig en kortfattet redegørelse for
+opgaven, men er bevidst løst formuleret. Det er altså op til
+\emph{dig} at finde ud af hvordan du bedst løser opgaverne. For
+eksempel kunne vi bede dig tilføje en bestemt abstrakt metode til en
+bestemt abstrakt klasse. Det er hermed op til dig at finde ud af,
+hvordan du skal implementere den nødvendige funktionalitet i de
+konkrete underklasser. En simpel opgavebeskrivelse er ikke nødvendigvis
+det samme som en simpel opgave, og omvendt.
+
+%% In cases where the task description seems absurd or unclear, we expect you to
+%% make a simplifying assumption about our intent. You should state your
+%% assumption clearly in the documentation of your solution.
+
+I tilfælde hvor opgavebeskrivelsen virker uklar, forventer vi at du
+foretager klargørende antagelser om hensigterne med opgaven. I sådanne
+tilfælde beder vi dig om at beskrive dine antagelser i dokumentationen
+til din løsning vha. javadoc eller andre kommentarer.
+
+%% The exercises are generally independent of one another, with the exception
+%of % Exercise \ref{ex:ranges}, which is necessary to successfully implement
+%Exercise % \ref{ex:plots}, and is desired, but not strictly speaking
+%necessary, to % successfully implement Exercises \ref{ex:undo} and %
+%\ref{ex:copy-paste}.
+
+Opgaverne er som udgangspunkt uafhængige af hinanden, med undtagelse af opgave
+\ref{ex:ranges}, som er nødvendig for at kunne implementere opgave
+\ref{ex:plots} korrekt. En løsning på opgave \ref{ex:ranges} er også
+foretrukket, omend ikke streng nødvendig, for at kunne løse opgaverne
+\ref{ex:undo} og \ref{ex:copy-paste}.
+
+\subsection{Generelt om oversættelse af engelske begreber}
+
+Inden for programmering (og datalogi generelt) er de fleste fagtermer
+og begreber på engelsk. Eftersom eksamensteksten skal være på dansk,
+vil der derfor nødvendigvis forekomme en blanding af engelske begreber
+oversat til dansk og engelske fagtermer brugt direkte. I tilfælde hvor
+engelske begreber er oversat til dansk vil vi så vidt muligt forsøge
+at bruge allerede eksisterende danske ord, og i tilfælde hvor
+betydningen ikke er helt klar vil vi skrive det engelske ord i
+parentes bagefter.
+
+I tilfælde af forvirring omkring brugen af danske udtryk og
+oversættelser henviser vi til diskussionforummet eller
+instruktorvagten, som vil kunne afklare uklarheder.
+
+\subsection{Terminologi}
+
+\begin{description}[\setleftmargin{60pt}\breaklabel\setlabelstyle{\it}]
+
+%% \item [Evaluation] An evaluation occurs whenever the user calls either the
+%% method \texttt{toInt()}, \texttt{toBoolean()}, or \texttt{toString()} on an
+%% expression. In other words, an evaluation is a walk of the syntax tree
+%% (expression) to produce some sort of a scalar result, be that an integer,
+%% boolean or string.
+
+\item [Evaluering] En evaluering forekommer når brugeren kalder en af metoderne
+\texttt{toInt()}, \texttt{toBoolean()} og \texttt{toString()} på et udtryk
+(Expression). Med andre ord resulterer en evaluering i at syntakstræet gås
+igennem og der produceres et resultat af typen \texttt{int}, \texttt{boolean}
+eller \texttt{String}.
+
+\item [Uforanderlig] En uforanderlig klasse kan forstås ved det engelske ord
+\textit{immutable} og er karakteriseret ved at felter i objekter for klassen
+ikke ændrer værdi efter objektet er blevet konstrueret. For eksempel er
+\texttt{Position} og \texttt{Expression} uforanderlige, mens
+\texttt{Application} ikke er.
+
+\end{description}

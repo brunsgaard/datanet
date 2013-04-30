@@ -69,3 +69,6 @@ nosetests.xml
 *.vrb
 *.xdy
 *.tdo
+
+assignment1/latex/output
+
