@@ -1,0 +1,24 @@
+
+\section{Practical part}
+\subsection{Socket Programming}
+
+\subsubsection{Question 1}
+
+Restricting the messages size to \texttt{BUFFER\_SIZE}, simplyfies receiving data, as one only need to have a buffer of the specified size. But it also puts a strict limit on the amount of data that can be sent.
+If one should take the token based approach, a good candidate for the token could be the \texttt{EOT} character, (ASCII number 4), meaning ``end of transmission''.
+Using a specific buffer size is required by the socket API, so one would need to use a combination of the two. If the last character recieved is not the toekn for end of message, one simply recieve data once more. Each part of the message then needs to be concatenated in the end to look at the whole message.
+For this particular case, limiting message size to 1024 should not be a big problem, as message sizes should be fairly small -- with the exception that one can make arbitrability large ECHO commands.
+
+\subsubsection{Question 2}
+
+As the protocol is stateless, as described below, we can just close the socket on the server. In our implementation the client program is terminated if the socket dies, so the client has to reconnect anyway.
+
+\subsubsection{Question 3}
+
+Each command in the protocol was manually tested to verify expected behavior. Both client and server handles malformed requests, by only reacting on the specified commands. To increase robustness, clients can handle situations where the server is not up or crashes within a session. The client does not handle malformed responses, it just prints whatever it gets.
+
+TODO: other basic steps?
+
+\subsubsection{Question 4}
+
+The protocol is stateless, because the server does not need to maintain any information about the client. In our implementation we keep the socket open, but the protocol does not require us to do so.
