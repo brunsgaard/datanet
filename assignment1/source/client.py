@@ -60,12 +60,23 @@ Usage examples:
         """
         The main loop of the server.
         """
+        #connect the client
+        try:
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        except socket.error as msg:
+            print "Could not create socket"
+            self.socket = None
+            return
+        try:
+            self.socket.connect( (self.serverip, self.port) )
+        except socket.error as msg:
+            print "Could not open socket to server"
+            self.socket.close()
+            self.socket = None
+            return
+
         sys.stdout.write(self.help())
         running = True
-
-        #connect the client
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect( (self.serverip, self.port) )
 
         while running:
             # read from keyboard
@@ -81,6 +92,10 @@ Usage examples:
                 if len(request) <= self.BUFFER_SIZE:
                     self.socket.send(request);
                     response = self.socket.recv(self.BUFFER_SIZE)
+
+                    if not response:
+                        print 'server did not respond, closing connection...'
+                        break
                 else:
                     response = "Too large command, max %d chars" % self.BUFFER_SIZE
 
@@ -100,4 +115,3 @@ if __name__ == '__main__':
     except Exception as e:
         print "error"
         print e
-

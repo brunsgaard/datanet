@@ -23,7 +23,7 @@ class Server:
         # Initialize the socket and data structures needed for the server.
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.server.bind( ('localhost', self.port) )
+        self.server.bind( ('0.0.0.0', self.port) )
         self.server.listen(0)
 
     def parse_command(self, command, sock):
@@ -33,8 +33,9 @@ class Server:
 
         tokens = command.strip().split()
 
+        #if PING
         if len(tokens) == 1 and tokens[0] == 'PING':
-            return '100 PONG %s %s' % (sock.getpeername(), str(datetime.now()))
+            return '100 PONG %s %s' % (sock.getpeername(), datetime.now().strftime("%H:%M:%S"))
 
         #if CALC
         if len(tokens) == 4 and tokens[0] == 'CALC':
@@ -55,7 +56,10 @@ class Server:
             else:
                return CALC_NAN_MSG
 
-            return "200 %s" % str(result)
+            if result == int(result):
+                result = int(result)
+
+            return "200 EQUALS %s" % str(result)
 
         #if ECHO
         #the below if is looking at the command string instead of the tokens list to allow for whitespaces
@@ -83,15 +87,17 @@ class Server:
 
             clientsock.close()
 
-            # TODO : why have the running variable?
-            #running = False
-
+        running = False
         self.server.close()
 
 #run the server
 if __name__ == "__main__":
     try:
-        Server().run()
+        server = Server()
+        server.run()
+    except KeyboardInterrupt:
+        server.server.close()
+        print "\nbye!"
     except Exception as e:
         print "error"
         print e
