@@ -36,14 +36,28 @@ In addition to propogation delay we have
         into the link. This is often the most most significant delay.
 \end{description}
 
+% Calculations for the subsection on transmission speed
+\subsubsection{Transmission speed}
+\includegraphics{../calc1.pdf}
+\newpage
+\includegraphics{../calc2.pdf}
+
 \subsection{Buffers and latency}
 \begin{description}
-    \item[Part 1]
-    \item[Part 2]
+    \item[Part 1] The link behind the DSL modem is limited to 54 Mb/s by the wireless connection,
+        but is significantly faster than the 2Mb/s upload speed of the modem. Given a continuous
+        upload burst it will be filled in approx. 78.7 milliseconds, leading to further packets being
+        dropped. This results in a maximum packet delay that is infinite. All packets from the student
+        will then be discarded.
+    \item[Part 2] The \emph{Bandwith-delay product} can be seen as a measurement of the
+        ``volume'' of the network link, describing how much data that can be on the link at
+        any point in time.
+        TODO: Why good measure, and what are consequences?
 \end{description}
 
 \subsection{HTTP}
 \subsubsection{HTTP semantics}
+\subsubsection{HTTP headers and fingerprinting}
 
 \subsubsection{The case of Deep Packet Inspection}
 \begin{description}
