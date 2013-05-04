@@ -59,19 +59,19 @@ In addition to propogation delay we have
 \subsection{HTTP}
 \subsubsection{HTTP semantics}
 \begin{description}
-    \item[Part 1] The request methods field is required to indicate the desired
+    \item[Part 1] The request method field is required to indicate the desired
         action to be performed on the server. The GET method means to retrieve
         the information identified by the Request-URI, and the POST method
         requests that the server accepts the entity enclosed in the request as
-        a new subordinate fo the Request-URI. In practice both GET and POST can
+        a new subordinate of the Request-URI. In practice both GET and POST can
         be used to post data to the server through query parameters, but only
         POST can contain a enclosed entity, Query parameters to requests are
-        often visable in the http servers log files etc, therefore posting
+        often visible in the http server's log files etc, therefore posting
         sensitive data using query parameters is very bad practice. Instead the
         enclosed entity in POST is used in practice to meet this problem.
 
     \item[Part 2] The following definition of the Host header is taken from
-        section 14.23 of RFC 2616, and clarify that the Host header is
+        section 14.23 of RFC 2616, and clarifies that the Host header is
         essential because it allows a server or gateway to differentiate
         between internally ambiguous URLs, and thereby enabling virtual
         hosting.
@@ -164,8 +164,17 @@ indexing in case of 4xx) based on the respons.
     client usually stores and sends the token as an HTTP cookie, in such cases
     the cookie is used as an unique identifier.
 
-\item[Part 2] 
-\item[Part 3] \url{http://www.arctic.org/~dean/tracking-without-cookies.html}
+\item[Part 2] Headers that might leak sensitive information can include the Server and X-Powered-By (used by PHP and others). These
+    headers gives the client information on the server infrastructure that is being used to host the page. The headers may be disabled
+    in the configuration files for most servers.
+\item[Part 3] Because the ETag may contain arbitrary values, it can hold a unique identifier given to a user. This identifier
+    is then sendt to the server whenever the page is requested. Instead of checking whether the page has been modified, the server
+    will then return the whole page and the same ETag identifier. This ensures that the identity value is persisted in the brower's
+    cache, and enables tracking of users.
+
+    If one also wishes to enable caching of pages, a specific resource (an image) can be injected into every page. This resource could handle
+    the tracking using ETags, and the rest of the pages could use ETags for simple caching.
+    %\url{http://www.arctic.org/~dean/tracking-without-cookies.html}
 \end{description}
 
 \subsubsection{The case of Deep Packet Inspection}

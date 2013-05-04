@@ -4,9 +4,9 @@
 
 \subsubsection{Question 1}
 
-Restricting the messages size to \texttt{BUFFER\_SIZE}, simplyfies receiving data, as one only need to have a buffer of the specified size. But it also puts a strict limit on the amount of data that can be sent.
+Restricting the messages size to \texttt{BUFFER\_SIZE}, simplifies receiving data, as one only need to have a buffer of the specified size. But it also puts a strict limit on the amount of data that can be sent.
 If one should take the token based approach, a good candidate for the token could be the \texttt{EOT} character, (ASCII number 4), meaning ``end of transmission''.
-Using a specific buffer size is required by the socket API, so one would need to use a combination of the two. If the last character recieved is not the toekn for end of message, one simply recieve data once more. Each part of the message then needs to be concatenated in the end to look at the whole message.
+Using a specific buffer size is required by the socket API, so one would need to use a combination of the two. If the last character recieved is not the token for end of message, one simply recieve data once more. Each part of the message then needs to be concatenated in the end to look at the whole message.
 For this particular case, limiting message size to 1024 should not be a big problem, as message sizes should be fairly small -- with the exception that one can make arbitrability large ECHO commands.
 
 \subsubsection{Question 2}
@@ -15,7 +15,17 @@ As the protocol is stateless, as described below, we can just close the socket o
 
 \subsubsection{Question 3}
 
-Each command in the protocol was manually tested to verify expected behavior. Both client and server handles malformed requests, by only reacting on the specified commands. To increase robustness, clients can handle situations where the server is not up or crashes within a session. The client does not handle malformed responses, it just prints whatever it gets.
+Each command in the protocol was manually tested to verify expected behavior. Both client and server handles malformed requests,
+by only reacting on the specified commands. To increase robustness, clients can handle situations where the server is not up
+or crashes within a session. The client does not handle malformed responses, it just prints whatever it gets.
+
+To increase the robustness of the server one might adopt a threaded architecture, where every connecting client gets their own thread.
+This could also enable several users to connect to the server in parallel. A crash in one thread would then kill the thread, but not
+interfere with the working of the other threads.
+
+The client could be crashed by sending responses containing control bytes back to the client. One might filter all the bytes that
+the client receives and only display those that are in a whitelist. However this change changes the output on the client side, and
+is arguably a violation of the lack of restrictions on messages that the protocol handles.
 
 TODO: other basic steps?
 
