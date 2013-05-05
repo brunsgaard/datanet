@@ -6,10 +6,10 @@
 \setup{%
   subject={Datanet},%
   assignment={Assignment 1},%
-  date={29 April, 2013}%
+  date={5 Maj, 2013}%
 }
 \setupLocation[short=DIKU]{Datalogisk institut, Københavns Universitet}
-\setupAuthor[addendum={ \ }]{Rasmus Wreidt Larsen \\ Martin Bjerregaard \\ Jonas Brunsgaard}
+\setupAuthor[addendum={ \ }]{Rasmus Wriedt Larsen \\ Martin Bjerregaard Jepsen \\ Jonas Brunsgaard}
 
 \newcommand{\commandstyle}[0]{{\ttfamily\textbackslash}}
 \newcommand{\command}[1]{\texttt{\textbackslash #1}}
@@ -52,9 +52,12 @@ In addition to propogation delay we have
         from the student will then be discarded.
     \item[Part 2] The \emph{Bandwith-delay product} can be seen as a
         measurement of the ``volume'' of the network link, describing how much
-        data that can be on the link at any point in time.
+        data that can be flowing on the link (in both directions) at any point in time.
         
-        TODO: Why good measure, and what are consequences?
+        It is a good measure of the adequate buffer size because it ensures that nodes
+        in the network will be 100\% utilized. If the buffer size is smaller than the
+        BDP a node sending at the maximum rate will not be able to saturate the network
+        link fully before having to wait for more data.
 \end{description}
 
 \subsection{HTTP}
