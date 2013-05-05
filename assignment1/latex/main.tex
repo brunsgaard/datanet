@@ -9,7 +9,7 @@
   date={29 April, 2013}%
 }
 \setupLocation[short=DIKU]{Datalogisk institut, Københavns Universitet}
-\setupAuthor[addendum={ \ }]{Rasmus Wreidt-Larsen \\ Martin Bjerregaard \\ Jonas Brunsgaard}
+\setupAuthor[addendum={ \ }]{Rasmus Wreidt Larsen \\ Martin Bjerregaard \\ Jonas Brunsgaard}
 
 \newcommand{\commandstyle}[0]{{\ttfamily\textbackslash}}
 \newcommand{\command}[1]{\texttt{\textbackslash #1}}
@@ -90,7 +90,7 @@ In addition to propogation delay we have
         what is happening behind the scenes.
 
 \begin{lstlisting}
-~ nc google.com 80                                                                    
+~ nc google.com 80
 GET / HTTP/1.1
 Host: google.com
 
@@ -118,7 +118,7 @@ But we end up at \url{http://www.google.dk}, so we may have been redirected
 again. Again we use \texttt{nc} to check.
 
 \begin{lstlisting}
-~ nc www.google.com 80                                                                    
+~ nc www.google.com 80
 GET / HTTP/1.1
 Host: www.google.com
 
@@ -159,7 +159,7 @@ indexing in case of 4xx) based on the respons.
     imply that the browser creates a cookie (if cookies are enabled). The
     client can now ask for a new resource on the same host and the cookie will
     be send with the new request.
-    
+
     A session token is a unique identifier used to identify a session, the
     client usually stores and sends the token as an HTTP cookie, in such cases
     the cookie is used as an unique identifier.
@@ -180,7 +180,7 @@ indexing in case of 4xx) based on the respons.
 \subsubsection{The case of Deep Packet Inspection}
 
 \begin{description}
-    \item[Part 1] '3' could have filtered all requests to
+    \item[Part 1] ``3'' could have filtered all requests to
         \texttt{grooveshark.com} by dropping all packets with a destination
         host being an IP belonging to that domain. This could be done in the
         network layer without breaking the layering model of the network stack.
