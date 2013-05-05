@@ -27,8 +27,6 @@ The client could be crashed by sending responses containing control bytes back t
 the client receives and only display those that are in a whitelist. However this change changes the output on the client side, and
 is arguably a violation of the lack of restrictions on messages that the protocol handles.
 
-TODO: other basic steps?
-
 \subsubsection{Question 4}
 
 The protocol is stateless, because the server does not need to maintain any information about the client. In our implementation we keep the socket open, but the protocol does not require us to do so.
