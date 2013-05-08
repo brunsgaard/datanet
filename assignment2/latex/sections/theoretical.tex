@@ -1,12 +1,61 @@
 \section{Theoretical part}
 
 \subsection{Domain Name System}
-\subsubsection{DNS provisions}
+\subsubsection{DNS provisions} % 2-4 sentences, too much?
+The DNS system ensures fault tolerance on a packet level through UDP, which wraps the segments
+in a header containing a checksum. On a system level fault tolerance is ensured because the system
+is designed as a distributed architecture, making sure that there are no central points of failure.
+Both of these techniques also ensure scalability by making making DNS have stateless connections and
+spreading requests out over a large amount of servers. Efficiency is then also ensured because UDP has
+a very low overhead compared to TCP, and one may query servers that are close.
+
 \subsubsection{DNS lookup and format}
+\begin{description}
+    % 2-4 sentences
+    \item[Part 1:] The CNAME record allows a server to be known through several aliases, such as
+        a web-server being named www.domain.tld and a ftp service on the same server being named
+        ftp.domain.tld. It may also be used to load-balance requests by returning CNAME records
+        for a domain that redirect users to servers that are closer to them.
+        %TODO: Can you set all CNAMES in the DNS or do you need something custom?
+    % 4-8 sentences
+    \item[Part 2:] Iterative lookups work by the root and TLD servers delegating further lookups
+        to the requesting party, instead of performing them themselves. This means that the local
+        DNS server that a client is asking will ask another server and receive an answer, then acting
+        on the information in that answer to fulfill the request (by further lookups). In a recursive
+        lookup the server that is being asked is the one that queries further servers for more detailed
+        information, and it will only return once it has an authoritative answer.
+
+        Iterative lookups place less strain on the DNS network, because only the local DNS server has
+        to maintain state about the request that is being answered. This enables the system to scale
+        better. The caches of the local DNS server will also be filled with information on authorative
+        and TLD servers, cutting off the root level and speeding up requests.
+        %TODO: When and why do we want recursive lookups?
+        % Is it something about using it to fill caches?
+    % diagram
+    \item[Part 3:]  
+\end{description}
 
 \subsection{Transport protocols}
 \subsubsection{TCP reliability and utilization}
+\begin{description}
+    \item[Part 1:] The 3-way handshake ensures that both sides have received the starting segment number of the other side.
+        If the final ACK is not sendt, the server cannot be certain that it's starting segment number has actually
+        reached the client. If we wish to be sure that the connection is correctly initialized on both sides we must
+        therefore use a 3-way-handshake.
+        % We can do the "simultaneous-open", but that is crazy
+    \item[Part 2:] TCP facilitates a full-duplex connection by making the ACK a field in the header of segments, thus
+        allowing mixing an answer to a segment with a new data segment to be delivered to the other side. The setup also
+        initializes the link in both directions, so both sides are ready to send to each other.
+\end{description}
+
 \subsubsection{Reliability vs overhead}
+\begin{description}
+    \item[Part 1:] TCP adds overhead both in the header (being approx. 20 bytes in size, compared to 8 bytes for UDP), and
+        by requiring that all segments are acknowledged and optionally re-sent. It must also negotiate segment numbers before
+        starting to transmit data, while UDP starts blasting data immediately.
+    \item[Part 2:] 
+\end{description}
+
 \subsubsection{Use of transport protocols}
 
 \subsection{TCP: Principles and practice}
