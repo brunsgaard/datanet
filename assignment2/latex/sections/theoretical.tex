@@ -1,7 +1,7 @@
 \section{Theoretical part}
 
 \subsection{Domain Name System}
-\subsubsection{DNS provisions} % 2-4 sentences, too much?
+\subsubsection{DNS provisions}
 The DNS system ensures fault tolerance on a packet level through UDP, which wraps the segments
 in a header containing a checksum. On a system level fault tolerance is ensured because the system
 is designed as a distributed architecture, making sure that there are no central points of failure.
@@ -31,7 +31,7 @@ a very low overhead compared to TCP, and one may query servers that are close.
         and TLD servers, cutting off the root level and speeding up requests.
         %TODO: When and why do we want recursive lookups?
         % Is it something about using it to fill caches?
-    % diagram
+    % Diagram
     \item[Part 3:]  
 \end{description}
 
@@ -42,7 +42,6 @@ a very low overhead compared to TCP, and one may query servers that are close.
         If the final ACK is not sendt, the server cannot be certain that it's starting segment number has actually
         reached the client. If we wish to be sure that the connection is correctly initialized on both sides we must
         therefore use a 3-way-handshake.
-        % We can do the "simultaneous-open", but that is crazy
     \item[Part 2:] TCP facilitates a full-duplex connection by making the ACK a field in the header of segments, thus
         allowing mixing an answer to a segment with a new data segment to be delivered to the other side. The setup also
         initializes the link in both directions, so both sides are ready to send to each other.
@@ -57,8 +56,51 @@ a very low overhead compared to TCP, and one may query servers that are close.
 \end{description}
 
 \subsubsection{Use of transport protocols}
+\begin{description}
+    \item[DNS part 1:] DNS employs the UDP transport protocol. This is because it has a low overhead, does not require
+        the connections to negotiate before sending data, or keep state on a connection. The result of this is that the DNS
+        protocol scales much better than if it was sent over a stateful transport protocol like TCP. %TODO: More?
+    % 3-8 sentences, including scenario
+    \item[DNS part 2:] 
+
+    % TODO: May data be mixed with the FIN packets?
+    \item[HTTP part 1:] The minimum number of packets is 3 for the handshake (where the last one can hold the request data because
+        of the large MTU), 2 for the server ACK with corresponding data and the client ACK, and 4 for the closing of the connection.
+        This results in a minimal number of 9 packets from a TCP perspective.
+    % TODO: Correct if packages change
+    \item[HTTP part 2:] Only 1/9 of the packets used for the connection actually transmit data. The justification for using
+        TCP despite of this overhead is the fact that it provides the reliability needed by HTTP (as discussed in the next part), and
+        that it allows for keeping connections open and thus reducing the setup overhead.
+    \item[HTTP part 3:] The choice of UDP as a transport protocol for HTTP would be poor, because the guarantees provided by
+        TCP are needed for HTTP transmissions. The use of HTTP does not allow for packets to be completely dropped (HTTP is not
+        loss-tolerant), and the data stream must be presented in-order for the documents to make sense. In addition to this the
+        HTTP protocol is naturally structured such that it fits the TCP model well, by defining a stream of requests and responses.
+        %TODO: More?
+\end{description}
 
 \subsection{TCP: Principles and practice}
+% Specify the point of view, is it from the client's or server's side (or both)?
 \subsubsection{TCP headers}
+\begin{description}
+    \item[Part 1.1:] 
+    \item[Part 1.2:] 
+    \item[Part 1.3:] 
+    \item[Part 1.4:] 
+    \item[Part 2:] 
+    \item[Part 3:] 
+\end{description}
+
 \subsubsection{High performance TCP}
+\begin{description}
+    \item[Part 1:] % Answer with a number and a sentence
+    \item[Part 2:] % Account for the calculations
+    \item[Part 3:] 
+\end{description}
+
 \subsubsection{Flow and Congestion control}
+\begin{description}
+    \item[Part 1:] 
+    \item[Part 2:] 
+    \item[Part 3:] % At most 10 sentences
+    \item[Part 4:] 
+\end{description}
