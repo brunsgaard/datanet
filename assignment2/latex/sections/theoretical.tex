@@ -32,7 +32,7 @@ a very low overhead compared to TCP, and one may query servers that are close.
         %TODO: When and why do we want recursive lookups?
         % Is it something about using it to fill caches?
     % Diagram
-    \item[Part 3:]  
+    \item[Part 3:]
 \end{description}
 
 \subsection{Transport protocols}
@@ -52,7 +52,7 @@ a very low overhead compared to TCP, and one may query servers that are close.
     \item[Part 1:] TCP adds overhead both in the header (being approx. 20 bytes in size, compared to 8 bytes for UDP), and
         by requiring that all segments are acknowledged and optionally re-sent. It must also negotiate segment numbers before
         starting to transmit data, while UDP starts blasting data immediately.
-    \item[Part 2:] 
+    \item[Part 2:]
 \end{description}
 
 \subsubsection{Use of transport protocols}
@@ -114,13 +114,23 @@ a very low overhead compared to TCP, and one may query servers that are close.
         \[ \frac{65535 * 8 \text{ bits}}{100 * 10^{6} \text{ bits/sec}} = 5.243 \text{ milliseconds} \]
         to send enough bytes to fill the receive window. We must therefore have $RTT \leq 5.243 \text{ milliseconds}$ to fully utilize
         the connection. %TODO: Calculate in another way?
-    \item[Part 3:] 
+    \item[Part 3:]
 \end{description}
 
 \subsubsection{Flow and Congestion control}
 \begin{description}
-    \item[Part 1:] 
-    \item[Part 2:] 
+    \item[Part 1:]
+    \item[Part 2:]
     \item[Part 3:] % At most 10 sentences
-    \item[Part 4:] 
+    \item[Part 4:]
+    %How many ACKs should the sender receive before doing a fast retransmit?
+    The sender should receive 4 ACKs without any packet arriving in between
+    -- one ACK for previous package and 3 duplicates. Then it can do the fast
+    retransmit.
+    %What does the sender need to implement?
+    The sender need to keep the content of non-ACK'ed packets as there may be a need to retransmit them.
+    The sender must also keep track of the number of duplicate ACKs arriving. If this number reaches 3 before receiving any other packet, the sender must retransmit the packet following the duplicate ACK'ed packet.
+    %What does the receiver need to implement?
+    The receiver must keep track of the sequence number for next packet arriving to make a continuous stream (next expected packet). If a packet arrives that has a higher sequence number, an ACK is send containing the sequence number for the next expected packet. The receiver must keep track of these ``higher'' packets, so when the gap fills, it can report which sequence number it is ready to receive next.
+
 \end{description}
