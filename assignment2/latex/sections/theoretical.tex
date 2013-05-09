@@ -60,9 +60,15 @@ a very low overhead compared to TCP, and one may query servers that are close.
     \item[DNS part 1:] DNS employs the UDP transport protocol. This is because it has a low overhead, does not require
         the connections to negotiate before sending data, or keep state on a connection. The result of this is that the DNS
         protocol scales much better than if it was sent over a stateful transport protocol like TCP. %TODO: More?
-    % 3-8 sentences, including scenario
-    \item[DNS part 2:] 
+    \item[DNS part 2:] The use of TCP for DNS could have eliminated cache-poisoning attacks, because an attacker would then have
+        to brute-force the 32-bit sequence number in the TCP packet in addition to the 16-bit DNS identification number.
+        Such an attack would clealy be infeasible.
 
+        The result of a cache-poisoning is that a DNS server caches an incorrect and malicious response, leading to malicious redirects
+        of the requests. The attack may then be spread further by legitimate requests to the poisoned server, that are then cached in
+        other servers. As an example one could attempt to poison the DNS server of a Danish ISP, redirecting all requests for common banks
+        to a compromised server. This server could then infect users or steal their credentials. One might also be able to redirect
+        the domains used to serve the NemID-applet, instead sending a compromised version to browsers.
     % TODO: May data be mixed with the FIN packets?
     \item[HTTP part 1:] The minimum number of packets is 3 for the handshake (where the last one can hold the request data because
         of the large MTU), 2 for the server ACK with corresponding data and the client ACK, and 4 for the closing of the connection.
@@ -82,18 +88,32 @@ a very low overhead compared to TCP, and one may query servers that are close.
 % Specify the point of view, is it from the client's or server's side (or both)?
 \subsubsection{TCP headers}
 \begin{description}
-    \item[Part 1.1:] 
-    \item[Part 1.2:] 
-    \item[Part 1.3:] 
-    \item[Part 1.4:] 
-    \item[Part 2:] 
-    \item[Part 3:] 
+    \item[Part 1.1:] The purpose of the RST bit is to inform the sender of a segment that it's destination IP or port was
+        incorrect, such that it will stop sending further segments or expect a connection to be set up. A TCP stack may return
+        a RST packet if you attempt to send a SYN packet with a destination port that is not listening.
+    \item[Part 1.2:] The sequence number header refers to the byte-stream number of the first byte in the sent segment. The
+        acknowledgement number header refers to the segment number of the next expected byte to be received. The acknowledgement
+        number header that is being sent in one direction is the sequence number of the last byte that was correctly received
+        plus one. %TODO: Rewrite?
+    \item[Part 1.3:] The purpose of the window is to enable flow control of TCP streams, such that a receiver is not overwhelmed
+        by data. A positive window size indicates that the sender may continue to send data, as there is room in the receive buffer
+        to store it.
+    \item[Part 1.4:] If the window size of the receiver is 0 the sender is required to send segments of size 1, such
+        that it may receive an ACK with an updated window size. If this was not the case then the sender might have been
+        permanently blocked from sending, even though the window size of the receiver changed.
+    \item[Part 2:] The sending of data in the third step (the ACK) of the 3-way-handshake is possible because the initial
+        sequence numbers have already been correctly exchanged at that point. %TODO: More?
+    \item[Part 3:] %TODO: Draw a diagram
 \end{description}
 
 \subsubsection{High performance TCP}
 \begin{description}
-    \item[Part 1:] % Answer with a number and a sentence
-    \item[Part 2:] % Account for the calculations
+    \item[Part 1:] The maximum possible number in receive window header is $2^{16}-1 = 65535$. This means that the throughput in one
+        direction is limited to \[\frac{65525}{RTT} \text{ B/msec}\] %TODO: Rewrite?
+    \item[Part 2:] Ignoring the overhead of TCP packet headers it would take a 100Mb/s connection
+        \[ \frac{65535 * 8 \text{ bits}}{100 * 10^{6} \text{ bits/sec}} = 5.243 \text{ milliseconds} \]
+        to send enough bytes to fill the receive window. We must therefore have $RTT \leq 5.243 \text{ milliseconds}$ to fully utilize
+        the connection. %TODO: Calculate in another way?
     \item[Part 3:] 
 \end{description}
 
