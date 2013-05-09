@@ -8,7 +8,7 @@ import errno
 class ChatPeer:
 
     BUFFERSIZE = 1024
-    
+
     def __init__(self):
 
         self.input_from = []
@@ -26,7 +26,7 @@ class ChatPeer:
         """
 
         running = True
-        
+
         while(running):
             # Print a simple prompt.
             sys.stdout.write('\n> ')
@@ -35,21 +35,58 @@ class ChatPeer:
             # This is the main loop of the peer
             #
             # This loop needs to:
-            # 
+            #
             # - Listen for new requests from the user (via stdin)
             # - Detect whether the socket to the name server has died
-            pass
+
+
+            # TODO: only reading right now
+            # TODO: why the fuck is it smart to read from stdin this way?
+            # so we can more easily test shit?
+            line = file.readline(self.input_from[0])
+            line = line.strip()
+            self.parse_user_request(line)
 
 
     def connect_to_ns(self, ns_ip, ns_port):
         """
-        Establish a connection to the name server and 
+        Establish a connection to the name server and
         preform the required handshake
         """
         # You need to setup the connection and preform the handshake here.
         # First you should initiate the socket and connect to the name
         # server before starting the handshake
-        pass
+
+        try:
+            ns_port = int(ns_port)
+        except ValueError as e:
+            print "Port was not an integer"
+            return
+
+        self.ns_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            self.ns_socket.connect( (ns_ip, ns_port) )
+        except socket.error as msg:
+            print "Could not open socket to server"
+            self.ns_socket.close()
+            self.ns_socket = None
+            return
+
+        request = "HELLO %s" % self.nick
+        self.ns_socket.send(request)
+        response = self.ns_socket.recv(self.BUFFERSIZE)
+
+        if response == "100 CONNECTED":
+            print "Connected"
+        elif response == "101 TAKEN":
+            print "nick already taken"
+            self.ns_socket.close()
+            self.ns_socket = None
+        else:
+            # TODO
+            print "Strange things happened"
+            self.ns_socket.close()
+            self.ns_socket = None
 
     def disconnect_from_ns(self):
         """
@@ -59,13 +96,22 @@ class ChatPeer:
         # letting it know that you are leaving. When getting the correct
         # response your peer should close the socket and set the ns_socket
         # to None.
-        pass
+
+        self.ns_socket.send("LEAVE")
+        response = self.ns_socket.recv(self.BUFFERSIZE)
+
+        if response != "400 BYE":
+            print "Unexpected response from server, closing connection:\n%s" % response
+
+        self.ns_socket.close()
+        self.ns_socket = None
+
 
     def parse_user_request(self, request):
         """
         Parse a request from the user and preform the appropriate actions
         """
-        # Please note: in this function we are using the ns_socket to 
+        # Please note: in this function we are using the ns_socket to
         # check whether we are connected or not. It is therefor important that
         # the ns_socket is set to None when we don't have a connection.
 
@@ -92,6 +138,12 @@ class ChatPeer:
             else:
                 print "Error: not connected"
 
+        elif tokens[0] == "/lookup" and len(tokens) == 2:
+            if self.ns_socket:
+                self.lookup_peer(tokens[1])
+            else:
+                print "Error: not connected"
+
         elif tokens[0] == "/leave":
             if self.ns_socket:
                 self.disconnect()
@@ -102,11 +154,11 @@ class ChatPeer:
         elif tokens[0] == "/quit":
             print "Shutting down"
             if self.ns_socket:
-                self.disconnect()
+                self.disconnect_from_ns()
             sys.exit(0)
 
         else:
-            print "Error: unknown message format"
+            print "Error: unknown command"
 
 
     def lookup_peer(self, user):
@@ -119,8 +171,19 @@ class ChatPeer:
         #
         # Note that this method should not be directly callable for the user.
         # You will need it for the next assignment.
-        
-        pass
+
+        request = "LOOKUP %s" % user
+        self.ns_socket.send(request)
+        response = self.ns_socket.recv(self.BUFFERSIZE)
+
+        tokens = response.split()
+
+        if tokens[0] == "200" and len(tokens) == 3:
+            print "user found at ip: %s" % tokens[2]
+        elif tokens[0] == "201":
+            print "user not found"
+        else:
+            print "Unexpected response from server: %s" % response
 
 
     def print_users(self):
@@ -131,7 +194,25 @@ class ChatPeer:
         # the list of online users from it.
         # You should then format this list and show it to the user.
         # Remember to put the current user on the list as well.
-        pass
+
+        self.ns_socket.send("USERLIST")
+        response = self.ns_socket.recv(self.BUFFERSIZE)
+
+        tokens = response.split()
+
+        if tokens[0] == "300":
+            print "%s - You" % self.nick
+            num_users = int(tokens[2])
+            users = " ".join(tokens[3:]).split(",")
+
+            for user in users:
+                user = user.strip()
+                print " - ".join( user.split() )
+
+        elif tokens[0] == "301":
+            print "%s - You" % self.nick
+        else:
+            print "Unexpected response from server: %s" % response
 
 # Run the server.
 if __name__ == "__main__":
