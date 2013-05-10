@@ -4,6 +4,7 @@ import socket
 import sys
 import select
 import errno
+import os
 
 class ChatPeer:
 
@@ -15,9 +16,6 @@ class ChatPeer:
         self.nick = ''
         self.ns_socket = None
 
-        # Append stdin to the list of inpt sources
-        # NOTE: this is only possible in Unix based system. If you are using
-        # Windows you can't do this trick.
         self.input_from.append(sys.stdin)
 
     def run(self):
@@ -40,12 +38,22 @@ class ChatPeer:
             # - Detect whether the socket to the name server has died
 
 
-            # TODO: only reading right now
-            # TODO: why the fuck is it smart to read from stdin this way?
-            # so we can more easily test shit?
-            line = file.readline(self.input_from[0])
-            line = line.strip()
-            self.parse_user_request(line)
+            # TODO: detect wether the socket has died
+
+            ready_to_read, _, _ = select.select(self.input_from, [], [])
+
+            for inputter in ready_to_read:
+                line = file.readline(inputter)
+
+                if not line or line == "\n":
+                    self.input_from.remove(inputter)
+                    if not self.input_from:
+                        print "Shutting down, no more input"
+                        self.quit()
+                else:
+                    if inputter != sys.stdin:
+                        sys.stdout.write(line)
+                    self.parse_user_request( line.strip() )
 
 
     def connect_to_ns(self, ns_ip, ns_port):
@@ -117,6 +125,10 @@ class ChatPeer:
 
         tokens = request.split()
 
+        if len(tokens) == 0:
+            print "Error: unknown command"
+            return
+
         if tokens[0] == "/connect" and len(tokens) == 3:
             if self.nick == "":
                 print "Error: you need to chose a nick name before connecting"
@@ -146,20 +158,30 @@ class ChatPeer:
 
         elif tokens[0] == "/leave":
             if self.ns_socket:
-                self.disconnect()
+                self.disconnect_from_ns()
                 print "Left Name Server"
             else:
                 print "Error: not connected"
 
         elif tokens[0] == "/quit":
             print "Shutting down"
-            if self.ns_socket:
-                self.disconnect_from_ns()
-            sys.exit(0)
-
+            self.quit()
         else:
             print "Error: unknown command"
 
+
+    def quit(self):
+        """
+        Quit and close sockets / file streams
+        """
+
+        if self.ns_socket:
+            self.disconnect_from_ns()
+
+        for inputter in self.input_from:
+            inputter.close()
+
+        sys.exit(0)
 
     def lookup_peer(self, user):
         """
@@ -196,18 +218,31 @@ class ChatPeer:
         # Remember to put the current user on the list as well.
 
         self.ns_socket.send("USERLIST")
-        response = self.ns_socket.recv(self.BUFFERSIZE)
 
-        tokens = response.split()
+        full_response = self.ns_socket.recv(self.BUFFERSIZE)
+
+
+        # Hack for knowning we get the whole message.
+        # If there's more to be received than the response to this query
+        # it will be included in the userlist printing.
+        self.ns_socket.setblocking(0)
+        while True:
+            try:
+                response = self.ns_socket.recv(self.BUFFERSIZE)
+                full_response += response
+            except socket.error as e:
+                break
+        self.ns_socket.setblocking(1)
+
+        tokens = full_response.split()
 
         if tokens[0] == "300":
             print "%s - You" % self.nick
-            num_users = int(tokens[2])
+
             users = " ".join(tokens[3:]).split(",")
 
             for user in users:
-                user = user.strip()
-                print " - ".join( user.split() )
+                print " - ".join( user.strip().split() )
 
         elif tokens[0] == "301":
             print "%s - You" % self.nick
@@ -216,4 +251,10 @@ class ChatPeer:
 
 # Run the server.
 if __name__ == "__main__":
-    ChatPeer().run()
+    chat_peer = ChatPeer()
+
+    if len(sys.argv) == 2:
+        if os.path.isfile(sys.argv[1]):
+            chat_peer.input_from.append(open(sys.argv[1],"r"))
+
+    chat_peer.run()

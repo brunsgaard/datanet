@@ -1,0 +1,2 @@
+/nick 1337noob
+/connect localhost 50000
