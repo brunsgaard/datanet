@@ -14,7 +14,7 @@ class ChatNameServer:
         self.names2info = {}
         self.socks2names = {}
 
-        # You should change these settings if not running the service locally
+        # these settings should be changed if not running the service locally
         ns_ip = 'localhost'
         ns_listen_port = 6789
 
@@ -26,9 +26,6 @@ class ChatNameServer:
 
         self.logger.info('Service initialized')
 
-        # Here you should setup the socket needed for listening for incoming
-        # peers trying to connect
-        #
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server.bind( (ns_ip, ns_listen_port) )
@@ -59,9 +56,7 @@ class ChatNameServer:
             for clientsock in ready_read:
                 request = clientsock.recv(self.BUFFERSIZE)
                 if not request:
-                    self.input_from.remove(clientsock)
                     self.logger.info( "disconnection from %s" % str(clientsock.getpeername()) )
-                    clientsock.close()
 
                     self.close_clientsock(clientsock)
                 else:
@@ -71,23 +66,11 @@ class ChatNameServer:
                         self.parse_request(request, clientsock)
 
 
-            # This is the main loop of the name server
-            #
-            # This loop needs to:
-            #
-            # - Listen for new sockets and create a connection to these
-            # - Listen for new request from already connected users
-            # - Detect dead sockets and remove these
-
-
     def connect_to_peer(self, request, sock):
         """
         Establish a connection to a new peer and
         preform the required handshake
         """
-
-        # You need to setup the connection and preform the handshake here.
-        # First you should accept the socket before starting the handshake
 
         tokens = request.split()
 
@@ -113,6 +96,10 @@ class ChatNameServer:
         Parse a request from a peer and preform the appropriate actions
         """
         tokens = request.split()
+
+        if not tokens:
+            sock.sendall("500 BAD FORMAT")
+            return
 
         name = self.socks2names[sock]
 
@@ -147,29 +134,21 @@ class ChatNameServer:
         """
         Send a list of all online users. Response should comply with the protocol
         """
-        # Here you should examine the list of connected peers
-        # and determine how many peers is connected.
-        # You will need to form the responce according to the protocol.
-        # Remenber that the user requesting the list shouldn't be on the list.
-
         user = self.socks2names[sock]
 
         if len(self.names2info) == 1:
             sock.sendall("301 ONLY USER")
         else:
-            msg = "300 INFO %d" % len(self.names2info)
+            msg = "300 INFO %d " % len(self.names2info)
 
-            first = True
+            infos = []
 
             for name in self.names2info:
                 if name != user:
-                    if not first:
-                        msg += ","
-                    else:
-                        first = False
-
                     ip, port = self.names2info[name]
-                    msg += " %s %s" % (name, ip)
+                    infos.append("%s %s" % (name, ip))
+
+            msg += ", ".join(infos)
 
             sock.sendall(msg)
 
@@ -190,6 +169,9 @@ class ChatNameServer:
             del self.socks2names[sock]
 
             self.logger.info("%s removed from name server" % name)
+
+        sock.close()
+        self.input_from.remove(sock)
 
 
 # Run the server.
