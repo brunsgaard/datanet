@@ -1,2 +1,2 @@
 /nick 1337noob
-/connect localhost 50000
+/connect localhost 6789

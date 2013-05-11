@@ -40,9 +40,9 @@ class ChatPeer:
 
             # TODO: detect wether the socket has died
 
-            ready_to_read, _, _ = select.select(self.input_from, [], [])
+            ready_read, _, _ = select.select(self.input_from, [], [])
 
-            for inputter in ready_to_read:
+            for inputter in ready_read:
                 line = file.readline(inputter)
 
                 if not line or line == "\n":

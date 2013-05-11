@@ -14,7 +14,7 @@ import string
 peers = []
 
 ip = "localhost"
-port = "50000"
+port = "6789"
 
 for i in range(10):
     peer = ChatPeer()
