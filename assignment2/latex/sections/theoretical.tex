@@ -2,58 +2,211 @@
 
 \subsection{Domain Name System}
 \subsubsection{DNS provisions}
-The DNS system ensures fault tolerance on a packet level through UDP, which wraps the segments
-in a header containing a checksum. On a system level fault tolerance is ensured because the system
-is designed as a distributed architecture, making sure that there are no central points of failure.
-Both of these techniques also ensure scalability by making making DNS have stateless connections and
-spreading requests out over a large amount of servers. Efficiency is then also ensured because UDP has
-a very low overhead compared to TCP, and one may query servers that are close.
+The DNS system ensures fault tolerance on a packet level through UDP, which
+wraps the segments in a header containing a checksum. On a system level fault
+tolerance is ensured because the system is designed as a distributed
+architecture, making sure that there are no central points of failure. Both of
+these techniques also ensure scalability by making making DNS have stateless
+connections and spreading requests out over a large amount of servers.
+Efficiency is then also ensured because UDP has a very low overhead compared to
+TCP, and one may query servers that are close.
 
 \subsubsection{DNS lookup and format}
 \begin{description}
     % 2-4 sentences
-    \item[Part 1:] The CNAME record allows a server to be known through several aliases, such as
-        a web-server being named www.domain.tld and a ftp service on the same server being named
-        ftp.domain.tld. It may also be used to load-balance requests by returning CNAME records
-        for a domain that redirect users to servers that are closer to them.
-        %TODO: Can you set all CNAMES in the DNS or do you need something custom?
-    % 4-8 sentences
-    \item[Part 2:] Iterative lookups work by the root and TLD servers delegating further lookups
-        to the requesting party, instead of performing them themselves. This means that the local
-        DNS server that a client is asking will ask another server and receive an answer, then acting
-        on the information in that answer to fulfill the request (by further lookups). In a recursive
-        lookup the server that is being asked is the one that queries further servers for more detailed
-        information, and it will only return once it has an authoritative answer.
+    \item[Part 1:] The CNAME record allows a server to be known through several
+        aliases, such as a web-server being named www.domain.tld and a ftp
+        service on the same server being named ftp.domain.tld. It may also be
+        used to load-balance requests by returning CNAME records for a domain
+        that redirect users to multiple servers, maybe even servers closer to
+        the user. Multiple CNAME records violates the standard,\footnote{BIND 9
+            Administrator Manual,
+        page 62} but is widely used in practice.
+    \item[Part 2:] Iterative lookups work by the root and TLD servers
+        delegating further lookups to the requesting party, instead of
+        performing them themselves.
+        This means that the local DNS server (the one that a client is asking),
+        will ask another server and receive an answer, then acting on the
+        information in that answer to fulfill the request (by further lookups).
+        In a recursive lookup the server that is being asked is the one that
+        queries further servers for more detailed information, and it will only
+        return once it has an authoritative answer.
 
-        Iterative lookups place less strain on the DNS network, because only the local DNS server has
-        to maintain state about the request that is being answered. This enables the system to scale
-        better. The caches of the local DNS server will also be filled with information on authorative
-        and TLD servers, cutting off the root level and speeding up requests.
-        %TODO: When and why do we want recursive lookups?
-        % Is it something about using it to fill caches?
+        Iterative lookups place less strain on the DNS network, because only
+        the local DNS server has to maintain state about the request that is
+        being answered. This enables the system to scale better. The caches of
+        the local DNS server will also be filled with information on
+        authoritative and TLD servers, cutting off the root level and speeding up
+        requests.
+
+        %TODO: When and why do we want recursive lookups? Is it something about
+        %using it to fill caches?
     % Diagram
-    \item[Part 3:]
+    \item[Part 3:] The query to \url{groveshark.com} is answered the follwoing
+        way. An important fact to note is that root servers are always
+        iterative servers.
+        \begin{enumerate}
+            \item DikuStudent sends the query 'what is the IP address of
+                \texttt{grooveshark.com}' to locally configured DNS server
+                \texttt{ns2.censurfridns.dk} at 89.104.194.142.
+            \item \texttt{ns2.censurfridns.dk} looks up
+                \texttt{grooveshark.com} in local cache, but nothing is found.
+            \item \texttt{ns2.censurfridns.dk} sends query to a root-server
+                (eg. \texttt{a.root-servers.net} at ip 198.41.0.4) for the
+                IP of \texttt{grooveshark.com}
+            \item The root-server throws the warning, "recursion requested but
+                not available", and replies with a referral to the TLD servers
+                for .com (\texttt{[a-m].gtld-servers.net})
+                \begin{lstlisting}
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 26454
+;; flags: qr rd; QUERY: 1, ANSWER: 0, AUTHORITY: 13, ADDITIONAL: 16
+;; WARNING: recursion requested but not available
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;groveshark.com.            IN  A
+
+;; AUTHORITY SECTION:
+com.            172800  IN  NS  a.gtld-servers.net.
+com.            172800  IN  NS  b.gtld-servers.net.
+com.            172800  IN  NS  c.gtld-servers.net.
+com.            172800  IN  NS  d.gtld-servers.net.
+com.            172800  IN  NS  e.gtld-servers.net.
+com.            172800  IN  NS  f.gtld-servers.net.
+com.            172800  IN  NS  g.gtld-servers.net.
+com.            172800  IN  NS  h.gtld-servers.net.
+com.            172800  IN  NS  i.gtld-servers.net.
+com.            172800  IN  NS  j.gtld-servers.net.
+com.            172800  IN  NS  k.gtld-servers.net.
+com.            172800  IN  NS  l.gtld-servers.net.
+com.            172800  IN  NS  m.gtld-servers.net.
+
+;; ADDITIONAL SECTION:
+a.gtld-servers.net. 172800  IN  AAAA    2001:503:a83e::2:30
+a.gtld-servers.net. 172800  IN  A   192.5.6.30
+b.gtld-servers.net. 172800  IN  AAAA    2001:503:231d::2:30
+b.gtld-servers.net. 172800  IN  A   192.33.14.30
+c.gtld-servers.net. 172800  IN  A   192.26.92.30
+d.gtld-servers.net. 172800  IN  A   192.31.80.30
+e.gtld-servers.net. 172800  IN  A   192.12.94.30
+f.gtld-servers.net. 172800  IN  A   192.35.51.30
+g.gtld-servers.net. 172800  IN  A   192.42.93.30
+h.gtld-servers.net. 172800  IN  A   192.54.112.30
+i.gtld-servers.net. 172800  IN  A   192.43.172.30
+j.gtld-servers.net. 172800  IN  A   192.48.79.30
+k.gtld-servers.net. 172800  IN  A   192.52.178.30
+l.gtld-servers.net. 172800  IN  A   192.41.162.30
+m.gtld-servers.net. 172800  IN  A   192.55.83.30
+
+;; Query time: 319 msec
+;; SERVER: 198.41.0.4#53(198.41.0.4)
+;; WHEN: Sun May 12 18:36:07 2013
+;; MSG SIZE  rcvd: 531
+
+                \end{lstlisting}
+            \item \texttt{ns2.censurfridns.dk } sends query 'what is the IP
+                address of \texttt{groveshark.com}' to one of the .com TLD servers (eg
+                \texttt{m.gtld-servers.net}).
+            \item The TLD server throws the warning, "recursion requested but
+                not available", and replies with a referral to the name servers
+                for \texttt{groveshark.com}
+                (\texttt{ns51.1and1.com} and \texttt{ns52.1and1.com})
+                \begin{lstlisting}
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 25222
+;; flags: qr rd; QUERY: 1, ANSWER: 0, AUTHORITY: 2, ADDITIONAL: 3
+;; WARNING: recursion requested but not available
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+;; QUESTION SECTION:
+;groveshark.com.            IN  A
+
+;; AUTHORITY SECTION:
+groveshark.com.     172800  IN  NS  ns51.1and1.com.
+groveshark.com.     172800  IN  NS  ns52.1and1.com.
+
+;; ADDITIONAL SECTION:
+ns51.1and1.com.     172800  IN  A   217.160.80.164
+ns52.1and1.com.     172800  IN  A   217.160.81.164
+
+;; Query time: 162 msec
+;; SERVER: 192.42.93.30#53(192.42.93.30)
+;; WHEN: Sun May 12 18:37:32 2013
+;; MSG SIZE  rcvd: 119
+                \end{lstlisting}
+            \item \texttt{ns2.censurfridns.dk } sends query 'what is the IP
+                address of groveshark.com' to one of the nameservers (eg.
+                \texttt{ns52.1and1.com}).
+            \item Zone file defines the A record for \texttt{groveshark.com}
+                \begin{lstlisting}
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 41882
+;; flags: qr aa rd; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+;; WARNING: recursion requested but not available
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 2800
+;; QUESTION SECTION:
+;groveshark.com.            IN  A
+
+;; ANSWER SECTION:
+groveshark.com.     10800   IN  A   74.208.29.191
+
+;; Query time: 24 msec
+;; SERVER: 217.160.81.164#53(217.160.81.164)
+;; WHEN: Sun May 12 18:38:15 2013
+;; MSG SIZE  rcvd: 59
+                \end{lstlisting}
+            \item Send response \texttt{groveshark.com} has A record
+                74.208.29.191, to DikuStudent.
+        \end{enumerate}
+        Below is a illustration of the queries made. If the root and tld server
+        had accepted the recursive request, then the root server would have
+        asked, then tld, who would have asked the authority dns server.
+        \begin{figure}[!h]
+        \centering
+        \includegraphics[trim = 55mm 30mm 55mm 30mm, clip, width=10cm]{112p3-pic}
+        \caption{Resolving groveshark.com}
+        \end{figure}
+
 \end{description}
 
 \subsection{Transport protocols}
 \subsubsection{TCP reliability and utilization}
 \begin{description}
-    \item[Part 1:] The 3-way handshake ensures that both sides have received the starting segment number of the other side.
-        If the final ACK is not sendt, the server cannot be certain that it's starting segment number has actually
-        reached the client. If we wish to be sure that the connection is correctly initialized on both sides we must
-        therefore use a 3-way-handshake.
-    \item[Part 2:] TCP facilitates a full-duplex connection by making the ACK a field in the header of segments, thus
-        allowing mixing an answer to a segment with a new data segment to be delivered to the other side. The setup also
-        initializes the link in both directions, so both sides are ready to send to each other.
+    \item[Part 1:] The 3-way handshake ensures that both sides have received
+        the starting segment number of the other side. If the final ACK is not
+        sendt, the server cannot be certain that it's starting segment number
+        has actually reached the client. If we wish to be sure that the
+        connection is correctly initialized on both sides we must therefore use
+        a 3-way-handshake.
+    \item[Part 2:] TCP facilitates a full-duplex connection by making the ACK a
+        field in the header of segments, thus allowing mixing an answer to a
+        segment with a new data segment to be delivered to the other side. The
+        setup also initializes the link in both directions, so both sides are
+        ready to send to each other.
 \end{description}
 
 \subsubsection{Reliability vs overhead}
 \begin{description}
-    \item[Part 1:] TCP adds overhead both in the header (being approx. 20 bytes in size, compared to 8 bytes for UDP), and
-        by requiring that all segments are acknowledged and optionally re-sent. It must also negotiate segment numbers before
-        starting to transmit data, while UDP starts blasting data immediately.
-    \item[Part 2:]
+    \item[Part 1:] TCP adds overhead both in the header (being approx. 20 bytes
+        in size, compared to 8 bytes for UDP), and by requiring that all
+        segments are acknowledged and optionally re-sent. It must also
+        negotiate segment numbers before starting to transmit data, while UDP
+        starts blasting data immediately.
+    \item[Part 2:] The TCP protocol uses a sequence number to identify each
+        byte of data, this number reflect the order of the bytes sent and is
+        used to ensure reliability of the data, the initial sequence number is
+        chosen at random, and simply incremented after each byte sent. When the
+        reciever receives a TCP segment, he checks that the sequence number
+        match's his acknowledgment number(the sequence number he expected
+        next), if it is a match, he increment the acknowledgment number by 1 and
+        put it in the header of the next TCP segment he sends back, if the
+        sequence number does not match, he will not increace the acknowledgment
+        number, but still sending the it back (and in that way telling the
+        sender, ``Hayo, I need from segmentnumber x and up'').
 \end{description}
+
 
 \subsubsection{Use of transport protocols}
 \begin{description}
