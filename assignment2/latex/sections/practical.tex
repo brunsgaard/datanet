@@ -1,1 +1,33 @@
 \section{Practical part}
+
+It is a bit redundant to send the IP in the userlist. If a client needs the IP of a user at some point, it can use the LOOKUP command.
+
+% TODO: section on the problem of len(user list msg) > BUFFERSIZE
+
+\begin{description} %
+    \item[Question 1]
+        It would be quite easy to recerse engineer the protocol by packet sniffing -- as it isn't a very complicated protocol, and every request and response even have nice human understandable messages. It would be a bit harder if the server only responded with status codes, but it would only make it slightly harder.
+        One could also use encryption to make it much harder to reverse engineer the protocol by sniffing packets, but then one might just try and decompile the client program, threrby learning the secret of the protocol.
+
+        %TODO: socket based technique that could be used to make this more difficult to reverse engineer?
+
+    \item[Question 2]
+        Having lots of open sockets to a server that does not transmit any data is a known problem in computer networking called ``connection flooding''. This could be target on the network layer, making a ``SYN flood'', which shouldn't matter much if the server has implemented SYN cookies (RFC 4987). It could also be targeted towards the application layer, where a malicious party could be making an open connection by doing the initial handshake with a randomly generated user name. Then all these open connections would take op precious recourses on the server. One could also try to limit the upstream bandwidth of the server by repeatately making USERLIST requests, as they generate a huge response compared to the very small request.
+
+    \item[Question 3]
+        There is no way for the name server to keep track of the active peers. A user may make an initial handshake, get the userlist, make a lookup and then go on chatting for hours on end without ever sending a message to the name server again. In this case the user would appear to be idle to the name server -- which in reality is not true -- so the name server should definitly not ``kick'' idle peers.
+
+        It seems like a user being idle is perceived as being a bad thing, we do not fully agree. Imagine a chat room for a programming library which have their own name server. If there is a silent period with no activity from the members they would get disconnected -- too bad for a user in need of help.
+
+        % TODO : do they mean skype like away?
+
+    \item[Question 4]
+        Advantages of having a centralized name server is that it is easy to manage. For example the initial lookup could be though DNS. If the name server was not central, one would need to add some service to let new users discover other uses.
+        The protocol does not have
+
+        Disadvantages of having a centralized name server is that it represents a single point of failure. If the server is down, no one can chat (or at least not establish new connections). This makes it easier to do a DoS attack on the service.
+
+        If we wanted to change the service, so it didn't use a centralized name server, we make use of the Chord algorithm for distributed hash tables.
+
+
+\end{description}
