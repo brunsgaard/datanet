@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from peer_handout import *
+from peer import *
 import StringIO
 import io
 import subprocess

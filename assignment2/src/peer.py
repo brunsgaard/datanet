@@ -30,22 +30,32 @@ class ChatPeer:
             sys.stdout.write('\n> ')
             sys.stdout.flush()
 
-            # This is the main loop of the peer
-            #
-            # This loop needs to:
-            #
-            # - Listen for new requests from the user (via stdin)
-            # - Detect whether the socket to the name server has died
+            listeners = self.input_from
 
+            if self.ns_socket:
+                listeners = self.input_from + [self.ns_socket]
 
-            # TODO: detect wether the socket has died
+            ready_read, _, wtfshit = select.select(listeners, [], [])
 
-            ready_read, _, _ = select.select(self.input_from, [], [])
+            if self.ns_socket in ready_read:
+                ready_read.remove(self.ns_socket)
+
+                server_msg = self.ns_socket.recv(self.BUFFERSIZE)
+
+                if server_msg:
+                    sys.stdout.write("\nserver said: %s\n" % server_msg)
+                else:
+                    self.ns_socket.close()
+                    self.ns_socket = None
+                    sys.stdout.write("\nserver closed connection\n")
+                sys.stdout.flush()
+                continue
+
 
             for inputter in ready_read:
                 line = file.readline(inputter)
 
-                if not line or line == "\n":
+                if not line:
                     self.input_from.remove(inputter)
                     if not self.input_from:
                         print "Shutting down, no more input"
@@ -61,14 +71,11 @@ class ChatPeer:
         Establish a connection to the name server and
         preform the required handshake
         """
-        # You need to setup the connection and preform the handshake here.
-        # First you should initiate the socket and connect to the name
-        # server before starting the handshake
 
         try:
             ns_port = int(ns_port)
         except ValueError as e:
-            print "Port was not an integer"
+            print "supplied port was not an integer"
             return
 
         self.ns_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -91,8 +98,7 @@ class ChatPeer:
             self.ns_socket.close()
             self.ns_socket = None
         else:
-            # TODO
-            print "Strange things happened"
+            print "Server did not accept nick, responded with:\n%s" % response
             self.ns_socket.close()
             self.ns_socket = None
 
@@ -100,10 +106,6 @@ class ChatPeer:
         """
         Close the connection properly to the name server
         """
-        # Here you should send the appropriate message to the name server
-        # letting it know that you are leaving. When getting the correct
-        # response your peer should close the socket and set the ns_socket
-        # to None.
 
         self.ns_socket.send("LEAVE")
         response = self.ns_socket.recv(self.BUFFERSIZE)
@@ -113,7 +115,6 @@ class ChatPeer:
 
         self.ns_socket.close()
         self.ns_socket = None
-
 
     def parse_user_request(self, request):
         """
@@ -187,12 +188,6 @@ class ChatPeer:
         """
         Query the name server for information on a user by it's nick
         """
-        # Here you should do a lookup request to the name server on a specific
-        # user and return the proper information if that user is connected to
-        # the service.
-        #
-        # Note that this method should not be directly callable for the user.
-        # You will need it for the next assignment.
 
         request = "LOOKUP %s" % user
         self.ns_socket.send(request)
@@ -212,19 +207,15 @@ class ChatPeer:
         """
         Get the list of online users and print it using nice formating
         """
-        # Here you should make a request to the name server and receive
-        # the list of online users from it.
-        # You should then format this list and show it to the user.
-        # Remember to put the current user on the list as well.
 
         self.ns_socket.send("USERLIST")
 
         full_response = self.ns_socket.recv(self.BUFFERSIZE)
 
 
-        # Hack for knowning we get the whole message.
-        # If there's more to be received than the response to this query
-        # it will be included in the userlist printing.
+        # Hack for receiving the whole message.
+        # If there's more messages to be received than the userlist message,
+        # it will be also be printed now :(
         self.ns_socket.setblocking(0)
         while True:
             try:
