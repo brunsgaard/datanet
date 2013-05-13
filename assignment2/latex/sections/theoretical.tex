@@ -38,9 +38,8 @@ TCP, and one may query servers that are close.
         authoritative and TLD servers, cutting off the root level and speeding up
         requests.
 
-        %TODO: When and why do we want recursive lookups? Is it something about
-        %using it to fill caches?
-    %TODO: See figure 2.21
+        Recursive lookups are justified because they reduce the number of client requests,
+        and because they allow for better caching in the local DNS server.
     \item[Part 3:] The query to \url{groveshark.com} is answered the follwoing
         way. An important fact to note is that root servers are always
         iterative servers.
@@ -193,17 +192,10 @@ groveshark.com.     10800   IN  A   74.208.29.191
         segments are acknowledged and optionally re-sent. It must also
         negotiate segment numbers before starting to transmit data, while UDP
         starts blasting data immediately.
-    \item[Part 2:] The TCP protocol uses a sequence number to identify each
-        byte of data, this number reflect the order of the bytes sent and is
-        used to ensure reliability of the data, the initial sequence number is
-        chosen at random, and simply incremented after each byte sent. When the
-        reciever receives a TCP segment, he checks that the sequence number
-        match's his acknowledgment number(the sequence number he expected
-        next), if it is a match, he increment the acknowledgment number by 1 and
-        put it in the header of the next TCP segment he sends back, if the
-        sequence number does not match, he will not increace the acknowledgment
-        number, but still sending the it back (and in that way telling the
-        sender, ``Hayo, I need from segmentnumber x and up'').
+    \item[Part 2:] TCP implements a reliable service by ensuring that dropped
+        packets are re-sent, and arrive to the application layer in the correct order.
+        As long as a catastrophic failure is not encountered (the connection might
+        suddenly drop) the packets should alwasy be delivered.
 \end{description}
 
 
@@ -249,8 +241,8 @@ groveshark.com.     10800   IN  A   74.208.29.191
     \item[Part 1.4:] If the window size of the receiver is 0 the sender is required to send segments of size 1, such
         that it may receive an ACK with an updated window size. If this was not the case then the sender might have been
         permanently blocked from sending, even though the window size of the receiver changed.
-    \item[Part 2:] The sending of data in the third step (the ACK) of the 3-way-handshake is possible because the initial
-        sequence numbers have already been correctly exchanged at that point. %TODO: More?
+    \item[Part 2:] The sending of data in the third step (the ACK) of the 3-way-handshake is always possible because the initial
+        sequence numbers have already been correctly exchanged at that point.
     \item[Part 3:] Below is the diagram.
         \begin{figure}[!h]
         \centering
@@ -263,13 +255,14 @@ groveshark.com.     10800   IN  A   74.208.29.191
 \begin{description}
     \item[Part 1:] The maximum possible number in receive window header is
         $2^{16}-1 = 65535$. This means that the throughput in one direction is
-        limited to \[\frac{65525}{RTT} \text{ B/msec}\] %TODO: Rewrite?
+        limited to \[\frac{65535}{RTT} \text{ B/msec}\]
     \item[Part 2:] Ignoring the overhead of TCP packet headers it would take a
         100Mb/s connection \[ \frac{65535 * 8 \text{ bits}}{100 * 10^{6} \text{
         bits/sec}} = 5.243 \text{ milliseconds} \] to send enough bytes to fill
         the receive window. We must therefore have $RTT \leq 5.243 \text{
         milliseconds}$ to fully utilize the connection.
-    \item[Part 3:] If the roundtrip time is 72, then - in one direction - we
+    \item[Part 3:] One might use the 'TCP Window Scale Option' to improve performance.
+        If the roundtrip time is 72, then - in one direction - we
         can send $$72=\frac{8x}{10^8} \Rightarrow x = 9 \times 10^8$$ bytes.
         
         We are able to change the window size in two ways. (i) change the
@@ -278,7 +271,7 @@ groveshark.com.     10800   IN  A   74.208.29.191
         We start by letting the window size be fixed at 65535 bytes and see
         that $9\times10^8$ is in between $65535*2^{13}=536862720$ and
         $65535*2^{14}=1073725440$, so we set the amount of bit-shifting to
-        $14$. Now we just have to solve the following equaltion to obtain the
+        $14$. Now we just have to solve the following equaltion to obtain
         the value for the actual windows size field $$2^{14}x=9\times10^8 \Rightarrow x=\ceil{3515625/64} = 54932$$
         So for full utilization of the 100Mb connection, you set the 'Window
         Size' field to 54932 and the 'TCP Window Scale Option' to bit shift by
@@ -287,11 +280,29 @@ groveshark.com.     10800   IN  A   74.208.29.191
 
 \subsubsection{Flow and Congestion control}
 \begin{description}
-    \item[Part 1:] Modern TCP implementation employ congestion control based on perceived network
-        congestion. This is not network assisted, and works by measuring the ACK that are received
-        to detect possible losses as a result of congestion. The traffic is then appropriately throttled.
-    \item[Part 2:] %TODO: Write me!
+    \item[Part 1:] Modern TCP implementation employ congestion control based on
+        perceived network congestion. This is not network assisted, and works
+        by measuring the ACK that are received to detect possible losses as a
+        result of congestion. The traffic is then appropriately throttled.
+
+    \item[Part 2:]
+        During the initial data transfer phase the Slow Start algorithm is
+        used, this algorithm continuously  increases transmission window size.
+
+        If it happens that one or more packets are dropped doing Slow Start,
+        then Congestion Avoidance is used to slow the transmission rate, by
+        setting the transmission window size to half of the current window
+        size.
+
+        Slow Start is used in conjunction with Congestion Avoidance, and thus
+        the data trasmission rate rises again over time instead of staying
+        slow.
+
+        If congestion is happenning on a later stage, the sender is forced into
+        Slow Start again.
+
     \item[Part 3:] %TODO: Write at most 10 sentences
+        
     \item[Part 4:]
     %How many ACKs should the sender receive before doing a fast retransmit?
     The sender should receive 4 ACKs without any packet arriving in between
