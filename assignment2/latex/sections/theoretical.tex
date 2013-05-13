@@ -285,18 +285,34 @@ groveshark.com.     10800   IN  A   74.208.29.191
         that $9\times10^8$ is in between $65535*2^{13}=536862720$ and
         $65535*2^{14}=1073725440$, so we set the amount of bit-shifting to
         $14$. Now we just have to solve the following equaltion to obtain the
-        the value for the actual windows size field $$2^{14}x=9\times10^8 \Rightarrow x=\ceil{3515625/64} = 54932$$
-        So for full utilization of the 100Mb connection, you set the 'Window
-        Size' field to 54932 and the 'TCP Window Scale Option' to bit shift by
-        14.
+        the value for the actual windows size field $$2^{14}x=9\times10^8
+        \Rightarrow x=\ceil{3515625/64} = 54932$$ So for full utilization of
+        the 100Mb connection, you set the 'Window Size' field to 54932 and the
+        'TCP Window Scale Option' to bit shift by 14.
 
 
 \end{description}
 
 \subsubsection{Flow and Congestion control}
 \begin{description}
-    \item[Part 1:]
-    \item[Part 2:]
+    \item[Part 1:] TCP uses end-to-end, congestion control rather than network
+        assisted congetion control, since the IP layer provides no explicit
+        feedback to the end systems regarding network
+        conngestion.\footnote{K\&R, 5. edition p. 307 }
+
+    \item[Part 2:] When a TCP connection starts up, the Slow Start algorithm
+        initializes a congestion window to one segment, after the first
+        successful transmission and acknowledgement of a TCP segment the window
+        is increased to two segments.
+
+        ``After successful transmission of these two segments and
+        acknowledgements completes, the window is increased to four segments.
+        Then eight segments, then sixteen segments and so on, doubling from
+        there on out up to the maximum window size advertised by the receiver
+        or until congestion finally does occur.'' \footnote{\url0}
+
+
+
     \item[Part 3:] % At most 10 sentences
     \item[Part 4:]
     %How many ACKs should the sender receive before doing a fast retransmit?
