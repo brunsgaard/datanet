@@ -18,7 +18,7 @@ port = "6789"
 
 for i in range(10):
     peer = ChatPeer()
-    nick = ''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for x in range(5))
+    nick = ''.join(random.choice(string.ascii_lowercase + string.ascii_uppercase + string.digits) for x in range(10))
     peer.parse_user_request("/nick %s" % nick)
     peer.parse_user_request("/connect %s %s" %(ip, port))
 
