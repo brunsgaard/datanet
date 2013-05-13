@@ -79,6 +79,7 @@ class ChatNameServer:
         if len(tokens) != 2 or tokens[0] != "HELLO" or "," in tokens[1]:
             sock.sendall("102 HANDSHAKE EXPECTED")
             self.logger.info("not enough info for handshake %s" % str(sock.getpeername()) )
+            self.close_clientsock(sock)
         else:
             name = tokens[1]
 
@@ -88,9 +89,9 @@ class ChatNameServer:
                 sock.sendall("100 CONNECTED")
                 self.logger.info("%s assigned to %s" % (name, sock.getpeername()) )
             else:
-                self.logger.info("%s was already taken, disconnecting %s" % (name, sock.getpeername()) )
                 sock.sendall("101 TAKEN")
-                close_clientsock(sock)
+                self.logger.info("%s was already taken, disconnecting %s" % (name, sock.getpeername()) )
+                self.close_clientsock(sock)
 
 
     def parse_request(self, request, sock):
