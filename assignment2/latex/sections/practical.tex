@@ -1,33 +1,38 @@
 \section{Practical part}
 
-It is a bit redundant to send the IP in the userlist. If a client needs the IP of a user at some point, it can use the LOOKUP command.
-
-% TODO: section on the problem of len(user list msg) > BUFFERSIZE
+\subsection{Other}
+\begin{description}
+    \item[large response on USERLIST]
+        If there are many users, the response from the server to for a USERLIST request, could be larger than the current BUFFERSIZE (1024 bytes). In the python implementation there is no way to known if the whole message was received in the first call to \texttt{recv}, if the message has length of \texttt{BUFFERSIZE}. Therefore after the client has received the response on the USERLIST request, it disables blocking receiving, and reads on the socket until no more can be read.
+    \item[Disconnection on handshake fail]
+        If the handshake does not succeed, the client is disconnected -- either with a ``101 TAKEN'' or ``102 HANDSHAKE EXPECTED'' reply. This is a minor change to the proposed protocol, where the client only should be disconnected when the nick was taken.
+    \item[Protocol fail]
+        We would also like to point our that the protocol is a bit redundant, as the USERLIST command lists the IP of each peer, which might not be needed, as this information can be obtained with the LOOKUP command. Instead the USERLIST command should just have return a list of users.
+\end{description}
 
 \begin{description} %
     \item[Question 1]
-        It would be quite easy to recerse engineer the protocol by packet sniffing -- as it isn't a very complicated protocol, and every request and response even have nice human understandable messages. It would be a bit harder if the server only responded with status codes, but it would only make it slightly harder.
-        One could also use encryption to make it much harder to reverse engineer the protocol by sniffing packets, but then one might just try and decompile the client program, threrby learning the secret of the protocol.
-
-        %TODO: socket based technique that could be used to make this more difficult to reverse engineer?
+        It would be quite easy to reverse engineer the protocol by packet sniffing -- as it isn't a very complicated protocol, and every request and response even have nice human understandable messages. It would be a bit harder if the server only responded with status codes, but it would only make it slightly harder.
+        One could use encryption to make it much harder to reverse engineer the protocol by sniffing packets, but an attacker might just try and decompile the client program, thereby learning the secret of the protocol. It would prevent a packet sniffer from knowing what messages was send over the network. This coudl be accomplished by the use of TLS/SSL.
 
     \item[Question 2]
-        Having lots of open sockets to a server that does not transmit any data is a known problem in computer networking called ``connection flooding''. This could be target on the network layer, making a ``SYN flood'', which shouldn't matter much if the server has implemented SYN cookies (RFC 4987). It could also be targeted towards the application layer, where a malicious party could be making an open connection by doing the initial handshake with a randomly generated user name. Then all these open connections would take op precious recourses on the server. One could also try to limit the upstream bandwidth of the server by repeatately making USERLIST requests, as they generate a huge response compared to the very small request.
+        Having lots of open sockets to a server that does not transmit any data is a known problem in computer networking called ``connection flooding''. This could be target on the network layer, making a ``SYN flood'', which shouldn't matter much if the server has implemented SYN cookies (RFC 4987). It could also be targeted towards the application layer, where a malicious party could be making an open connection by doing the initial handshake with a randomly generated user name. Then all these open connections would take op precious recourses on the server. One could also try to limit the upstream bandwidth of the server by repeatedly making USERLIST requests, as they generate a huge response compared to the very small request.
+        If we used an end marker as discussed in assignment 1, and a malicious peer kept on sending crap, our server would fill up their buffers.
 
     \item[Question 3]
-        There is no way for the name server to keep track of the active peers. A user may make an initial handshake, get the userlist, make a lookup and then go on chatting for hours on end without ever sending a message to the name server again. In this case the user would appear to be idle to the name server -- which in reality is not true -- so the name server should definitly not ``kick'' idle peers.
+        There is no way for the name server to keep track of the active peers. A user may make an initial handshake, get the userlist, make a lookup and then go on chatting for hours on end without ever sending a message to the name server again. In this case the user would appear to be idle to the name server -- which in reality is not true -- so the name server should definitely not ``kick'' idle peers.
 
         It seems like a user being idle is perceived as being a bad thing, we do not fully agree. Imagine a chat room for a programming library which have their own name server. If there is a silent period with no activity from the members they would get disconnected -- too bad for a user in need of help.
 
-        % TODO : do they mean skype like away?
+        If one wanted to reduce the number of open sockets kept by all the idle clients, one could implement a session scheme, where each client is given a session token when the handshake is completed. The socket can then be closed, and whenever the client wants to access the server, it will establish the connection again, sending it's session token to identify it already has registered a nick. To let the server known a user is still online, the client should send a small message to let the name server known it's still alive, maybe each 2 minutes or something in that way. This way the name server would be able to handle many more active peers at once, as it does not need to reserve at socket for each peer.
 
     \item[Question 4]
         Advantages of having a centralized name server is that it is easy to manage. For example the initial lookup could be though DNS. If the name server was not central, one would need to add some service to let new users discover other uses.
         The protocol does not have
 
-        Disadvantages of having a centralized name server is that it represents a single point of failure. If the server is down, no one can chat (or at least not establish new connections). This makes it easier to do a DoS attack on the service.
+        Disadvantages of having a centralized name server is that it represents a single point of failure. If the server is down, no one can chat (or at least not establish new connections). This makes it easier to do a DoS attack on the service. A central name server would not be able to handle a million users -- distributed might.
 
-        If we wanted to change the service, so it didn't use a centralized name server, we make use of the Chord algorithm for distributed hash tables.
+        If we wanted to change the service, so it didn't use a centralized name server, we could make use of the Chord algorithm for distributed hash tables. We would still require some entry point for new clients, for establishing the initial connection to another peer.
 
 
 \end{description}
