@@ -7,6 +7,7 @@ import logging
 class ChatNameServer:
 
     BUFFERSIZE = 1024
+    MAX_NICK_LENGTH = 32
 
     def __init__(self):
 
@@ -52,15 +53,13 @@ class ChatNameServer:
                 self.input_from.append(clientsock)
                 self.logger.info( "connection from %s" % str(clientsock.getpeername()) )
 
-
             for clientsock in ready_read:
                 request = clientsock.recv(self.BUFFERSIZE)
                 if not request:
                     self.logger.info( "disconnection from %s" % str(clientsock.getpeername()) )
-
                     self.close_clientsock(clientsock)
                 else:
-                    if not clientsock in self.socks2names:
+                    if clientsock not in self.socks2names:
                         self.connect_to_peer(request, clientsock)
                     else:
                         self.parse_request(request, clientsock)
@@ -74,24 +73,30 @@ class ChatNameServer:
 
         tokens = request.split()
 
-
-
-        if len(tokens) != 2 or tokens[0] != "HELLO" or "," in tokens[1]:
+        if len(tokens) != 2 or tokens[0] != "HELLO":
             sock.sendall("102 HANDSHAKE EXPECTED")
             self.logger.info("not enough info for handshake %s" % str(sock.getpeername()) )
             self.close_clientsock(sock)
-        else:
-            name = tokens[1]
+            return
 
-            if not name in self.names2info:
-                self.socks2names[sock] = name
-                self.names2info[name] = sock.getpeername()
-                sock.sendall("100 CONNECTED")
-                self.logger.info("%s assigned to %s" % (name, sock.getpeername()) )
-            else:
-                sock.sendall("101 TAKEN")
-                self.logger.info("%s was already taken, disconnecting %s" % (name, sock.getpeername()) )
-                self.close_clientsock(sock)
+        name = tokens[1]
+
+        if "," in name or self.MAX_NICK_LENGTH < len(name):
+            sock.sendall("103 INVALID NICK")
+            self.logger.info( "%s invalid nick %s" % (name, sock.getpeername() ) )
+            self.close_clientsock(sock)
+            return
+
+        if name in self.names2info:
+            sock.sendall("101 TAKEN")
+            self.logger.info("%s was already taken, disconnecting %s" % (name, sock.getpeername()) )
+            self.close_clientsock(sock)
+            return
+
+        self.socks2names[sock] = name
+        self.names2info[name] = sock.getpeername()
+        sock.sendall("100 CONNECTED")
+        self.logger.info("%s assigned to %s" % (name, sock.getpeername()) )
 
 
     def parse_request(self, request, sock):
