@@ -9,6 +9,7 @@ import os
 class ChatPeer:
 
     BUFFERSIZE = 1024
+    MAX_NICK_LENGTH = 32
 
     def __init__(self):
 
@@ -93,14 +94,17 @@ class ChatPeer:
 
         if response == "100 CONNECTED":
             print "Connected"
-        elif response == "101 TAKEN":
+            return
+
+        if response == "101 TAKEN":
             print "nick already taken"
-            self.ns_socket.close()
-            self.ns_socket = None
+        elif response == "103 INVALID NICK":
+            print "server said your nick was invalid"
         else:
-            print "Server did not accept nick, responded with:\n%s" % response
-            self.ns_socket.close()
-            self.ns_socket = None
+            print "Server did not accept nick, responded with: %s\n" % response
+
+        self.ns_socket.close()
+        self.ns_socket = None
 
     def disconnect_from_ns(self):
         """
@@ -111,7 +115,8 @@ class ChatPeer:
         response = self.ns_socket.recv(self.BUFFERSIZE)
 
         if response != "400 BYE":
-            print "Unexpected response from server, closing connection:\n%s" % response
+            print "Unexpected response from server:%s\n" % response
+            print "Closing connection"
 
         self.ns_socket.close()
         self.ns_socket = None
@@ -141,6 +146,8 @@ class ChatPeer:
         elif tokens[0] == "/nick" and len(tokens) == 2:
             if ',' in tokens[1]:
                 print "Error: can't pick a nick name with ',' in it"
+            elif self.MAX_NICK_LENGTH < tokens[1]:
+                print "Error: nick too long, max %d characters" % self.MAX_NICK_LENGTH
             else:
                 self.nick = tokens[1]
                 print 'Nick changed to ' + self.nick
@@ -238,7 +245,7 @@ class ChatPeer:
         elif tokens[0] == "301":
             print "%s - You" % self.nick
         else:
-            print "Unexpected response from server: %s" % response
+            print "Unexpected response from server: %s" % full_response
 
 # Run the server.
 if __name__ == "__main__":

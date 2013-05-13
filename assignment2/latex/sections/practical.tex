@@ -1,19 +1,24 @@
 \section{Practical part}
 
-\subsection{Other}
+\subsection{Notes}
 \begin{description}
     \item[large response on USERLIST]
-        If there are many users, the response from the server to for a USERLIST request, could be larger than the current BUFFERSIZE (1024 bytes). In the python implementation there is no way to known if the whole message was received in the first call to \texttt{recv}, if the message has length of \texttt{BUFFERSIZE}. Therefore after the client has received the response on the USERLIST request, it disables blocking receiving, and reads on the socket until no more can be read.
+        If there are many users, the response from the server to for a USERLIST request, could be larger than the current BUFFERSIZE (1024 bytes). In the python implementation there is no way to known if the whole message was received in the first call to \texttt{recv}, if the string obtained has length of \texttt{BUFFERSIZE}. Therefore after the client has received the response on the USERLIST request, it disables blocking receiving, and reads on the socket until no more can be read. This issue could be avoided by using and end-marker as discussed in assignment 1.
+    \item[Max nick length]
+        We added a limitation on the maximum length of a nick, to 32 characters. Allowing users to have arbitrarily long nicks did not suit us.
+    \item[Invalid nick]
+        An error code was added to the protocol for handling invalid nick names. This includes two cases, when a user tries to include a comma in his/her username, or if the length exceeds the maximum length. This got the message ``103 INVALID NICK''.
     \item[Disconnection on handshake fail]
-        If the handshake does not succeed, the client is disconnected -- either with a ``101 TAKEN'' or ``102 HANDSHAKE EXPECTED'' reply. This is a minor change to the proposed protocol, where the client only should be disconnected when the nick was taken.
+        If the handshake does not succeed, the client is disconnected -- either with a ``101 TAKEN'', ``102 HANDSHAKE EXPECTED'' or ``103 INVALID NICK'' reply. This is a minor change to the proposed protocol, where the client only should be disconnected when the nick was taken.
     \item[Protocol fail]
         We would also like to point our that the protocol is a bit redundant, as the USERLIST command lists the IP of each peer, which might not be needed, as this information can be obtained with the LOOKUP command. Instead the USERLIST command should just have return a list of users.
 \end{description}
 
+\subsection{Questions}
 \begin{description} %
     \item[Question 1]
         It would be quite easy to reverse engineer the protocol by packet sniffing -- as it isn't a very complicated protocol, and every request and response even have nice human understandable messages. It would be a bit harder if the server only responded with status codes, but it would only make it slightly harder.
-        One could use encryption to make it much harder to reverse engineer the protocol by sniffing packets, but an attacker might just try and decompile the client program, thereby learning the secret of the protocol. It would prevent a packet sniffer from knowing what messages was send over the network. This coudl be accomplished by the use of TLS/SSL.
+        One could use encryption to make it much harder to reverse engineer the protocol by sniffing packets, but an attacker might just try and decompile the client program, thereby learning the secret of the protocol. It would prevent a packet sniffer from knowing what messages was send over the network. This could be accomplished by the use of TLS/SSL.
 
     \item[Question 2]
         Having lots of open sockets to a server that does not transmit any data is a known problem in computer networking called ``connection flooding''. This could be target on the network layer, making a ``SYN flood'', which shouldn't matter much if the server has implemented SYN cookies (RFC 4987). It could also be targeted towards the application layer, where a malicious party could be making an open connection by doing the initial handshake with a randomly generated user name. Then all these open connections would take op precious recourses on the server. One could also try to limit the upstream bandwidth of the server by repeatedly making USERLIST requests, as they generate a huge response compared to the very small request.
