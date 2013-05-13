@@ -272,7 +272,8 @@ groveshark.com.     10800   IN  A   74.208.29.191
         \[ \frac{65535 * 8 \text{ bits}}{100 * 10^{6} \text{ bits/sec}} = 5.243 \text{ milliseconds} \]
         to send enough bytes to fill the receive window. We must therefore have $RTT \leq 5.243 \text{ milliseconds}$ to fully utilize
         the connection. %TODO: Calculate in another way?
-    \item[Part 3:]
+    \item[Part 3:] First we determine how many bytes we can send in 72 ms. $$72=\frac{8x}{10^8} \Rightarrow x = 9 \times 10^8$$ 
+
 \end{description}
 
 \subsubsection{Flow and Congestion control}
