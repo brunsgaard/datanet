@@ -13,7 +13,6 @@ TCP, and one may query servers that are close.
 
 \subsubsection{DNS lookup and format}
 \begin{description}
-    % 2-4 sentences
     \item[Part 1:] The CNAME record allows a server to be known through several
         aliases, such as a web-server being named www.domain.tld and a ftp
         service on the same server being named ftp.domain.tld. It may also be
@@ -41,7 +40,7 @@ TCP, and one may query servers that are close.
 
         %TODO: When and why do we want recursive lookups? Is it something about
         %using it to fill caches?
-    % Diagram
+    %TODO: See figure 2.21
     \item[Part 3:] The query to \url{groveshark.com} is answered the follwoing
         way. An important fact to note is that root servers are always
         iterative servers.
@@ -179,7 +178,7 @@ groveshark.com.     10800   IN  A   74.208.29.191
         sendt, the server cannot be certain that it's starting segment number
         has actually reached the client. If we wish to be sure that the
         connection is correctly initialized on both sides we must therefore use
-        a 3-way-handshake.
+        all parts of the 3-way-handshake.
     \item[Part 2:] TCP facilitates a full-duplex connection by making the ACK a
         field in the header of segments, thus allowing mixing an answer to a
         segment with a new data segment to be delivered to the other side. The
@@ -222,11 +221,9 @@ groveshark.com.     10800   IN  A   74.208.29.191
         other servers. As an example one could attempt to poison the DNS server of a Danish ISP, redirecting all requests for common banks
         to a compromised server. This server could then infect users or steal their credentials. One might also be able to redirect
         the domains used to serve the NemID-applet, instead sending a compromised version to browsers.
-    % TODO: May data be mixed with the FIN packets?
     \item[HTTP part 1:] The minimum number of packets is 3 for the handshake (where the last one can hold the request data because
         of the large MTU), 2 for the server ACK with corresponding data and the client ACK, and 4 for the closing of the connection.
         This results in a minimal number of 9 packets from a TCP perspective.
-    % TODO: Correct if packages change
     \item[HTTP part 2:] Only 1/9 of the packets used for the connection actually transmit data. The justification for using
         TCP despite of this overhead is the fact that it provides the reliability needed by HTTP (as discussed in the next part), and
         that it allows for keeping connections open and thus reducing the setup overhead.
@@ -234,7 +231,6 @@ groveshark.com.     10800   IN  A   74.208.29.191
         TCP are needed for HTTP transmissions. The use of HTTP does not allow for packets to be completely dropped (HTTP is not
         loss-tolerant), and the data stream must be presented in-order for the documents to make sense. In addition to this the
         HTTP protocol is naturally structured such that it fits the TCP model well, by defining a stream of requests and responses.
-        %TODO: More?
 \end{description}
 
 \subsection{TCP: Principles and practice}
@@ -242,12 +238,11 @@ groveshark.com.     10800   IN  A   74.208.29.191
 \subsubsection{TCP headers}
 \begin{description}
     \item[Part 1.1:] The purpose of the RST bit is to inform the sender of a segment that it's destination IP or port was
-        incorrect, such that it will stop sending further segments or expect a connection to be set up. A TCP stack may return
-        a RST packet if you attempt to send a SYN packet with a destination port that is not listening.
+        incorrect, such that it will stop sending further segments or stop expecting a connection to be set up. A TCP stack
+        may return a RST packet if you attempt to send a SYN packet with a destination port that is not listening.
     \item[Part 1.2:] The sequence number header refers to the byte-stream number of the first byte in the sent segment. The
         acknowledgement number header refers to the segment number of the next expected byte to be received. The acknowledgement
-        number header that is being sent in one direction is the sequence number of the last byte that was correctly received
-        plus one. %TODO: Rewrite?
+        number header that is being sent in one direction is the sequence number of the next byte that is expected to be received.
     \item[Part 1.3:] The purpose of the window is to enable flow control of TCP streams, such that a receiver is not overwhelmed
         by data. A positive window size indicates that the sender may continue to send data, as there is room in the receive buffer
         to store it.
@@ -273,12 +268,11 @@ groveshark.com.     10800   IN  A   74.208.29.191
         100Mb/s connection \[ \frac{65535 * 8 \text{ bits}}{100 * 10^{6} \text{
         bits/sec}} = 5.243 \text{ milliseconds} \] to send enough bytes to fill
         the receive window. We must therefore have $RTT \leq 5.243 \text{
-        milliseconds}$ to fully utilize the connection. %TODO: Calculate in
-        another way?
+        milliseconds}$ to fully utilize the connection.
     \item[Part 3:] If the roundtrip time is 72, then - in one direction - we
         can send $$72=\frac{8x}{10^8} \Rightarrow x = 9 \times 10^8$$ bytes.
         
-        We are able to change the windos size in two ways. (i) change the
+        We are able to change the window size in two ways. (i) change the
         actual window size value, (ii) change the amount of bit shifting.
         
         We start by letting the window size be fixed at 65535 bytes and see
@@ -289,15 +283,15 @@ groveshark.com.     10800   IN  A   74.208.29.191
         So for full utilization of the 100Mb connection, you set the 'Window
         Size' field to 54932 and the 'TCP Window Scale Option' to bit shift by
         14.
-
-
 \end{description}
 
 \subsubsection{Flow and Congestion control}
 \begin{description}
-    \item[Part 1:]
-    \item[Part 2:]
-    \item[Part 3:] % At most 10 sentences
+    \item[Part 1:] Modern TCP implementation employ congestion control based on perceived network
+        congestion. This is not network assisted, and works by measuring the ACK that are received
+        to detect possible losses as a result of congestion. The traffic is then appropriately throttled.
+    \item[Part 2:] %TODO: Write me!
+    \item[Part 3:] %TODO: Write at most 10 sentences
     \item[Part 4:]
     %How many ACKs should the sender receive before doing a fast retransmit?
     The sender should receive 4 ACKs without any packet arriving in between
