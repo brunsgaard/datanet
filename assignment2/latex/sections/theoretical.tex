@@ -266,13 +266,30 @@ groveshark.com.     10800   IN  A   74.208.29.191
 
 \subsubsection{High performance TCP}
 \begin{description}
-    \item[Part 1:] The maximum possible number in receive window header is $2^{16}-1 = 65535$. This means that the throughput in one
-        direction is limited to \[\frac{65525}{RTT} \text{ B/msec}\] %TODO: Rewrite?
-    \item[Part 2:] Ignoring the overhead of TCP packet headers it would take a 100Mb/s connection
-        \[ \frac{65535 * 8 \text{ bits}}{100 * 10^{6} \text{ bits/sec}} = 5.243 \text{ milliseconds} \]
-        to send enough bytes to fill the receive window. We must therefore have $RTT \leq 5.243 \text{ milliseconds}$ to fully utilize
-        the connection. %TODO: Calculate in another way?
-    \item[Part 3:] First we determine how many bytes we can send in 72 ms. $$72=\frac{8x}{10^8} \Rightarrow x = 9 \times 10^8$$ 
+    \item[Part 1:] The maximum possible number in receive window header is
+        $2^{16}-1 = 65535$. This means that the throughput in one direction is
+        limited to \[\frac{65525}{RTT} \text{ B/msec}\] %TODO: Rewrite?
+    \item[Part 2:] Ignoring the overhead of TCP packet headers it would take a
+        100Mb/s connection \[ \frac{65535 * 8 \text{ bits}}{100 * 10^{6} \text{
+        bits/sec}} = 5.243 \text{ milliseconds} \] to send enough bytes to fill
+        the receive window. We must therefore have $RTT \leq 5.243 \text{
+        milliseconds}$ to fully utilize the connection. %TODO: Calculate in
+        another way?
+    \item[Part 3:] If the roundtrip time is 72, then - in one direction - we
+        can send $$72=\frac{8x}{10^8} \Rightarrow x = 9 \times 10^8$$ bytes.
+        
+        We are able to change the windos size in two ways. (i) change the
+        actual window size value, (ii) change the amount of bit shifting.
+        
+        We start by letting the window size be fixed at 65535 bytes and see
+        that $9\times10^8$ is in between $65535*2^{13}=536862720$ and
+        $65535*2^{14}=1073725440$, so we set the amount of bit-shifting to
+        $14$. Now we just have to solve the following equaltion to obtain the
+        the value for the actual windows size field $$2^{14}x=9\times10^8 \Rightarrow x=\ceil{3515625/64} = 54932$$
+        So for full utilization of the 100Mb connection, you set the 'Window
+        Size' field to 54932 and the 'TCP Window Scale Option' to bit shift by
+        14.
+
 
 \end{description}
 
