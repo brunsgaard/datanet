@@ -2,10 +2,75 @@
 
 \subsection{The Internet Protocol}
 \subsubsection{Addresses and network masks}
+\begin{description}
+    \item[Part 1.1:] From a router's point of view the purpose of network masks is to
+        reduce the size of the forwarding table. Because all IP addresses in the same network
+        have the same prefix, a router only needs to store the prefix.
+    \item[Part 1.2:] Network masks may be expressed in the same dotted quad notation
+        that IP addresses are expressed in (because they are also 4 bytes long).
+        255.225.255.0 is not a valid network mask, because it is not a continuous
+        prefix of 1-bits. In the slash-notation we would interpret /28 as a prefix
+        of 28 1-bits, or the network mask 255.255.255.240.
+    \item[Part 1.3:] The difference is that the network prefix was constrained to be of length
+        8, 16 or 24 bits in classful addressing, and can be of any length in classless
+        interdomain routing.
+    \item[Part 1.4:] The network address is simply the IP anded with the network mask (byte form),
+        and the broadcast address is the network address plus \\$2^{32-\text{prefixlength}} - 1$.
+        The size of the network is $2^{\text{prefixlength}} - 2$ (subtracting 2 for the network
+        and broadcast address). The available addresses are found in the interval between the network
+        and broadcast address.
+
+    %TODO: When I get a nice tool for it, very soon
+    \item[Part 2.1:]
+        Size of the network: 30\\
+        Network address: 130.225.165.0\\
+        Network mask: 255.255.255.224\\
+        Broadcast address: 130.225.156.31\\
+        First, fifth, last address: 130.225.165.1, 130.225.165.5, 130.225.165.30
+    \item[Part 2.2:]
+        Size of the network: 510\\
+        Network address: 10.0.42.0\\
+        Network mask: 255.255.254.0\\
+        Broadcast address: 10.0.43.255\\
+        First, fifth, last address: 10.0.42.1, 10.0.42.5, 10.0.43.254
+    \item[Part 2.3:]
+        Size of the network: 1\\
+        Network address:?\\
+        Network mask: 255.255.255.255\\
+        Broadcast address:?\\
+        First, fifth, last address:?
+    \item[Part 2.4:]
+        Size of the network: 16382\\
+        Network address: \\
+        Network mask: 255.255.192.0\\
+        Broadcast address: \\
+        First, fifth, last address: 
+\end{description}
 
 \subsubsection{Network Address Translation}
+\begin{description}
+    \item[Part 1:]  
+    \item[Part 2:]  
+    \item[Part 3:] NAT breaks the layering principle of the Internet because it alters the
+        contents of the 
+\end{description}
 
 \subsection{Distributed Hash Tables}
+\begin{description}
+    \item[Part 1:] 
+    \item[Part 2:] 
+    \item[Part 3:] 
+\end{description}
 
 \subsection{SSH Tunneling}
 \subsubsection{{\sc Echoserver} $\leftrightarrow$ {\sc Client}}
+\begin{description}
+    \item[Question 1:] 
+    \item[Question 2:] 
+    \item[Question 3:] 
+    \item[Question 4:] 
+    \item[Question 5:] 
+    \item[Question 6:] 
+    \item[Question 7:] 
+    \item[Question 8:] 
+\end{description}
