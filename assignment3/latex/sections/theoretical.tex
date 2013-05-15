@@ -49,10 +49,16 @@
 
 \subsubsection{Network Address Translation}
 \begin{description}
-    \item[Part 1:]  
-    \item[Part 2:]  
-    \item[Part 3:] NAT breaks the layering principle of the Internet because it alters the
-        contents of the 
+    \item[Part 1:] NAT-enabled routers handle multiple connections by maintaining a NAT translation
+        table that maps pairs of internal IPs and ports to external ports. Each connection is given
+        an external port in the router, such that traffic going back to the router can be de-multiplexed
+        and sent to the appropriate internal IP and port.
+    \item[Part 2:] Because ports are limited to 16 bits, there are only 65536 possible ports to choose from.
+        If 65536 long lived connections are opened by the internal hosts, no further mappings can be made in
+        the NAT translation table. The routers ports are exhausted, and no further connections can be made.
+    \item[Part 3:] NAT breaks the layering principle of the Internet because it alters the contents of the 
+        transport layer port field. This is not allowed in the layering model, because a router only handles
+        the layers up to the network layer.
 \end{description}
 
 \subsection{Distributed Hash Tables}
