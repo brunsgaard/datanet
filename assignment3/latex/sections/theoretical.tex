@@ -81,9 +81,13 @@
 \subsection{SSH Tunneling}
 \subsubsection{{\sc Echoserver} $\leftrightarrow$ {\sc Client}}
 \begin{description}
-    \item[Question 1:] 
-    \item[Question 2:] 
-    \item[Question 3:] 
+    \item[Question 1:] At this point the echo server is waiting for clients to connect to it. It is blocking on
+        the accept call at line 24.
+    \item[Question 2:] The port number appears in both established sockets because it is in the source of the client's
+        socket, and the destination of the server's socket (TCP if full duplex, so there is a connection in both directions).
+        The port number was chosen randomly as the port for the client's outgoing connection.
+    \item[Question 3:] One can see all messages sent to and from the server in the TCP dump. This is because they are sent
+        unencrypted over the network (so every hop on the way will also be able to read them).
     \item[Question 4:] 
     \item[Question 5:] 
     \item[Question 6:] 
