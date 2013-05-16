@@ -287,7 +287,7 @@ groveshark.com.     10800   IN  A   74.208.29.191
 
     \item[Part 2:]
         During the initial data transfer phase the Slow Start algorithm is
-        used, this algorithm continuously  increases transmission window size.
+        used, this algorithm continuously increases transmission window size.
 
         If it happens that one or more packets are dropped doing Slow Start,
         then Congestion Avoidance is used to slow the transmission rate, by
@@ -301,7 +301,17 @@ groveshark.com.     10800   IN  A   74.208.29.191
         If congestion is happening on a later stage, the sender is forced into
         Slow Start again.
 
-    \item[Part 3:] %TODO: Write at most 10 sentences
+    \item[Part 3:] When the connection is being established the congestion
+        window is set to the MMS.
+
+        If the first transmission is successful and the sender receives a
+        acknowledgement the congestion window is doubled. This
+        behavior continues, and the congestion window keeps doubling from there
+        on and until a timeout occurs or the receiver reaches its limit.
+
+        If a timeout occurs the congestion window is halfed. After this point,
+        the congestion window is increased by one segment, per segment that
+        are acknowledged by the sender in the transmission.
 
     \item[Part 4:]
     %How many ACKs should the sender receive before doing a fast retransmit?

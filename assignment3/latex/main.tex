@@ -1,0 +1,26 @@
+\documentclass[a4paper]{article}
+
+\usepackage[fancy]{template}
+\usepackage{survival-pack}
+
+\setup{%
+  subject={Datanet},%
+  assignment={Assignment 2},%
+  date={13 May, 2013}%
+}
+\setupLocation[short=DIKU]{Department of Computer Science,\\University of Copenhagen}
+\setupAuthor[addendum={ \ }]{Jonas Brunsgaard \\ Martin Bjerregaard Jepsen \\ Rasmus Wriedt Larsen}
+
+\newcommand{\commandstyle}[0]{{\ttfamily\textbackslash}}
+\newcommand{\command}[1]{\texttt{\textbackslash #1}}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{first}
+\newpage
+
+\input{sections/theoretical.tex}
+\input{sections/practical.tex}
+
+\end{document}
