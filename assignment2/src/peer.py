@@ -146,7 +146,7 @@ class ChatPeer:
         elif tokens[0] == "/nick" and len(tokens) == 2:
             if ',' in tokens[1]:
                 print "Error: can't pick a nick name with ',' in it"
-            elif self.MAX_NICK_LENGTH < tokens[1]:
+            elif self.MAX_NICK_LENGTH < len(tokens[1]):
                 print "Error: nick too long, max %d characters" % self.MAX_NICK_LENGTH
             else:
                 self.nick = tokens[1]

@@ -77,6 +77,7 @@ class Server:
 
         while running:
             clientsock, addr = self.server.accept()
+            print "tada"
 
             while True:
                 command = clientsock.recv(self.BUFFER_SIZE)

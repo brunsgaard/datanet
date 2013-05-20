@@ -309,19 +309,33 @@ groveshark.com.     10800   IN  A   74.208.29.191
         behavior continues, and the congestion window keeps doubling from there
         on and until a timeout occurs or the receiver reaches its limit.
 
-        If a timeout occurs the congestion window is halfed. After this point,
-        the congestion window is increased by one segment, per segment that
-        are acknowledged by the sender in the transmission.
+        If the threshold is reached the congestion window is increased by one
+        segment, per segment that are acknowledged by the sender in the
+        transmission.
+
+        If a timeout happens before the threshold is reached, Slow Start will
+        start over.
+
+        If congestion is due to retransmission timer expiring or the
+        reception of duplicate ACKs, the congestion window is halfed.
 
     \item[Part 4:]
     %How many ACKs should the sender receive before doing a fast retransmit?
-    The sender should receive 4 ACKs without any packet arriving in between
-    -- one ACK for previous package and 3 duplicates. Then it can do the fast
+    The sender should receive 4 ACKs without any packet arriving in between --
+    one ACK for previous package and 3 duplicates. Then it can do the fast
     retransmit.
     %What does the sender need to implement?
-    The sender need to keep the content of non-ACK'ed packets as there may be a need to retransmit them.
-    The sender must also keep track of the number of duplicate ACKs arriving. If this number reaches 3 before receiving any other packet, the sender must retransmit the packet following the duplicate ACK'ed packet.
+    The sender need to keep the content of non-ACK'ed packets as there may be a
+    need to retransmit them. The sender must also keep track of the number of
+    duplicate ACKs arriving. If this number reaches 3 before receiving any
+    other packet, the sender must retransmit the packet following the duplicate
+    ACK'ed packet.
     %What does the receiver need to implement?
-    The receiver must keep track of the sequence number for next packet arriving to make a continuous stream (next expected packet). If a packet arrives that has a higher sequence number, an ACK is send containing the sequence number for the next expected packet. The receiver must keep track of these ``higher'' packets, so when the gap fills, it can report which sequence number it is ready to receive next.
+    The receiver must keep track of the sequence number for next packet
+    arriving to make a continuous stream (next expected packet). If a packet
+    arrives that has a higher sequence number, an ACK is send containing the
+    sequence number for the next expected packet. The receiver must keep track
+    of these ``higher'' packets, so when the gap fills, it can report which
+    sequence number it is ready to receive next.
 
 \end{description}
