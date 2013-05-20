@@ -1,0 +1,48 @@
+# after having established connection, message sent: hejhejhej
+
+# on local machine
+$ netstat -an | egrep '130.225.96.225|Address'
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 192.168.0.11:39676      130.225.96.225:22       ESTABLISHED
+
+$ sudo tcpdump -Xs 1514 port 39676 -i wlan0
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on wlan0, link-type EN10MB (Ethernet), capture size 1514 bytes
+22:06:50.004458 IP RasmusWL-S430.local.39676 > ask.diku.dk.ssh: Flags [P.], seq 3066705582:3066705630, ack 1313069127, win 324, options [nop,nop,TS val 1000252 ecr 674476924], length 48
+    0x0000:  4510 0064 1514 4000 4006 80fa c0a8 000b  E..d..@.@.......
+    0x0010:  82e1 60e1 9afc 0016 b6ca 36ae 4e43 d847  ..`.......6.NC.G
+    0x0020:  8018 0144 aeb3 0000 0101 080a 000f 433c  ...D..........C<
+    0x0030:  2833 b37c 09a9 b044 ad14 e784 ae7b 59b7  (3.|...D.....{Y.
+    0x0040:  9cce 0a7a 7b74 a51b f122 5519 a372 8803  ...z{t..."U..r..
+    0x0050:  3520 d13b dc23 5a31 4fb8 66f3 acc9 48f1  5..;.#Z1O.f...H.
+    0x0060:  f631 e476                                .1.v
+22:06:50.072481 IP ask.diku.dk.ssh > RasmusWL-S430.local.39676: Flags [P.], seq 1:129, ack 48, win 125, options [nop,nop,TS val 674509440 ecr 1000252], length 128
+    0x0000:  4500 00b4 e3d6 4000 3206 bff7 82e1 60e1  E.....@.2.....`.
+    0x0010:  c0a8 000b 0016 9afc 4e43 d847 b6ca 36de  ........NC.G..6.
+    0x0020:  8018 007d b599 0000 0101 080a 2834 3280  ...}........(42.
+    0x0030:  000f 433c df43 b086 3522 2a5d 881a 75f9  ..C<.C..5"*]..u.
+    0x0040:  951a bbf3 4846 9f62 0653 b3a5 95f6 5721  ....HF.b.S....W!
+    0x0050:  a9da f03f 1e73 2387 786a 6ca4 2773 5c6d  ...?.s#.xjl.'s\m
+    0x0060:  384b 2086 e90a f137 49e4 82f2 75e0 9d53  8K.....7I...u..S
+    0x0070:  144d 01a9 8c3a 8eec 1def 5d74 6826 1234  .M...:....]th&.4
+    0x0080:  e425 6467 31fc 6def 8048 d864 644c f73f  .%dg1.m..H.ddL.?
+    0x0090:  e1ab a94d 6654 d2e9 e7ae 3dc0 bd8e 93ad  ...MfT....=.....
+    0x00a0:  6b08 97e8 157c dc10 36c1 d956 1348 3ef2  k....|..6..V.H>.
+    0x00b0:  1cfa 36de                                ..6.
+22:06:50.072527 IP RasmusWL-S430.local.39676 > ask.diku.dk.ssh: Flags [.], ack 129, win 323, options [nop,nop,TS val 1000269 ecr 674509440], length 0
+    0x0000:  4510 0034 1515 4000 4006 8129 c0a8 000b  E..4..@.@..)....
+    0x0010:  82e1 60e1 9afc 0016 b6ca 36de 4e43 d8c7  ..`.......6.NC..
+    0x0020:  8010 0143 a49c 0000 0101 080a 000f 434d  ...C..........CM
+    0x0030:  2834 3280                                (42.
+
+
+# on ask
+$ netstat -an | egrep '2.111.93.104|Address'
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 130.225.96.225:22       2.111.93.104:39676      ESTABLISHED
+
+$ netstat -an | egrep 'Address|6002'
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 127.0.0.1:6002          0.0.0.0:*               LISTEN
+tcp        0      0 127.0.0.1:6002          127.0.0.1:35299         ESTABLISHED
+tcp        0      0 127.0.0.1:35299         127.0.0.1:6002          ESTABLISHED

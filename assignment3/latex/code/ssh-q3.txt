@@ -1,0 +1,32 @@
+# after having established connection, message sent: hejhejhej
+
+$ netstat -an | egrep '6789|Address'
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 127.0.0.1:6789          0.0.0.0:*               LISTEN
+tcp        0      0 127.0.0.1:6789          127.0.0.1:33000         ESTABLISHED
+tcp        0      0 127.0.0.1:33000         127.0.0.1:6789          ESTABLISHED
+
+$ sudo tcpdump -Xs 1514 port 6789 -i lo
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on lo, link-type EN10MB (Ethernet), capture size 1514 bytes
+13:55:53.351681 IP localhost.33000 > localhost.6789: Flags [P.], seq 3618640162:3618640171, ack 2713362031, win 257, options [nop,nop,TS val 2779685 ecr 2745738], length 9
+    0x0000:  4500 003d f4ad 4000 4006 480b 7f00 0001  E..=..@.@.H.....
+    0x0010:  7f00 0001 80e8 1a85 d7b0 1122 a1ba 9e6f  ..........."...o
+    0x0020:  8018 0101 fe31 0000 0101 080a 002a 6a25  .....1.......*j%
+    0x0030:  0029 e58a 6865 6a68 656a 6865 6a         .)..hejhejhej
+13:55:53.351733 IP localhost.6789 > localhost.33000: Flags [.], ack 9, win 256, options [nop,nop,TS val 2779685 ecr 2779685], length 0
+    0x0000:  4500 0034 7be5 4000 4006 c0dc 7f00 0001  E..4{.@.@.......
+    0x0010:  7f00 0001 1a85 80e8 a1ba 9e6f d7b0 112b  ...........o...+
+    0x0020:  8010 0100 fe28 0000 0101 080a 002a 6a25  .....(.......*j%
+    0x0030:  002a 6a25                                .*j%
+13:55:53.351817 IP localhost.6789 > localhost.33000: Flags [P.], seq 1:22, ack 9, win 256, options [nop,nop,TS val 2779685 ecr 2779685], length 21
+    0x0000:  4500 0049 7be6 4000 4006 c0c6 7f00 0001  E..I{.@.@.......
+    0x0010:  7f00 0001 1a85 80e8 a1ba 9e6f d7b0 112b  ...........o...+
+    0x0020:  8018 0100 fe3d 0000 0101 080a 002a 6a25  .....=.......*j%
+    0x0030:  002a 6a25 6672 6f6d 5f73 6572 7665 723a  .*j%from_server:
+    0x0040:  6865 6a68 656a 6865 6a                   hejhejhej
+13:55:53.351891 IP localhost.33000 > localhost.6789: Flags [.], ack 22, win 257, options [nop,nop,TS val 2779685 ecr 2779685], length 0
+    0x0000:  4500 0034 f4ae 4000 4006 4813 7f00 0001  E..4..@.@.H.....
+    0x0010:  7f00 0001 80e8 1a85 d7b0 112b a1ba 9e84  ...........+....
+    0x0020:  8010 0101 fe28 0000 0101 080a 002a 6a25  .....(.......*j%
+    0x0030:  002a 6a25                                .*j%

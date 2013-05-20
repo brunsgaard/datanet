@@ -36,7 +36,7 @@ class ChatPeer:
             if self.ns_socket:
                 listeners = self.input_from + [self.ns_socket]
 
-            ready_read, _, wtfshit = select.select(listeners, [], [])
+            ready_read, _, _ = select.select(listeners, [], [])
 
             if self.ns_socket in ready_read:
                 ready_read.remove(self.ns_socket)
