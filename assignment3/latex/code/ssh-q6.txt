@@ -1,0 +1,28 @@
+# after having established connection, message sent: hejhejhej
+
+$ netstat -an | egrep '6790|Address'
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 127.0.0.1:6790          0.0.0.0:*               LISTEN
+tcp        0      0 127.0.0.1:52926         127.0.0.1:6790          ESTABLISHED
+tcp        0      0 127.0.0.1:6790          127.0.0.1:52926         ESTABLISHED
+tcp6       0      0 ::1:6790                :::*                    LISTEN
+
+$ sudo tcpdump -Xs 1514 port 6790 -i lo
+tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
+listening on lo, link-type EN10MB (Ethernet), capture size 1514 bytes
+21:57:40.447997 IP localhost.52926 > localhost.6790: Flags [P.], seq 2905874139:2905874148, ack 4207445878, win 257, options [nop,nop,TS val 862862 ecr 860254], length 9
+    0x0000:  4500 003d 00c8 4000 4006 3bf1 7f00 0001  E..=..@.@.;.....
+    0x0010:  7f00 0001 cebe 1a86 ad34 1edb fac8 8776  .........4.....v
+    0x0020:  8018 0101 fe31 0000 0101 080a 000d 2a8e  .....1........*.
+    0x0030:  000d 205e 6865 6a68 656a 6865 6a         ...^hejhejhej
+21:57:40.468936 IP localhost.6790 > localhost.52926: Flags [P.], seq 1:22, ack 9, win 256, options [nop,nop,TS val 862868 ecr 862862], length 21
+    0x0000:  4500 0049 9976 4000 4006 a336 7f00 0001  E..I.v@.@..6....
+    0x0010:  7f00 0001 1a86 cebe fac8 8776 ad34 1ee4  ...........v.4..
+    0x0020:  8018 0100 fe3d 0000 0101 080a 000d 2a94  .....=........*.
+    0x0030:  000d 2a8e 6672 6f6d 5f73 6572 7665 723a  ..*.from_server:
+    0x0040:  6865 6a68 656a 6865 6a                   hejhejhej
+21:57:40.468973 IP localhost.52926 > localhost.6790: Flags [.], ack 22, win 257, options [nop,nop,TS val 862868 ecr 862868], length 0
+    0x0000:  4500 0034 00c9 4000 4006 3bf9 7f00 0001  E..4..@.@.;.....
+    0x0010:  7f00 0001 cebe 1a86 ad34 1ee4 fac8 878b  .........4......
+    0x0020:  8010 0101 fe28 0000 0101 080a 000d 2a94  .....(........*.
+    0x0030:  000d 2a94                                ..*.

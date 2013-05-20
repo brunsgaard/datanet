@@ -57,7 +57,7 @@
     \item[Part 2:] Because ports are limited to 16 bits, there are only 65536 possible ports to choose from.
         If 65536 long lived connections are opened by the internal hosts, no further mappings can be made in
         the NAT translation table. The routers ports are exhausted, and no further connections can be made.
-    \item[Part 3:] NAT breaks the layering principle of the Internet because it alters the contents of the 
+    \item[Part 3:] NAT breaks the layering principle of the Internet because it alters the contents of the
         transport layer port field. This is not allowed in the layering model, because a router only handles
         the layers up to the network layer.
 \end{description}
@@ -86,11 +86,21 @@
     \item[Question 2:] The port number appears in both established sockets because it is in the source of the client's
         socket, and the destination of the server's socket (TCP if full duplex, so there is a connection in both directions).
         The port number was chosen randomly as the port for the client's outgoing connection.
-    \item[Question 3:] One can see all messages sent to and from the server in the TCP dump. This is because they are sent
+    \item[Question 3:] One can see all messages sent to and from the server in the TCP dump. This is because they are sent. See \autoref{sub:q3-tcp} for TCP dump.
         unencrypted over the network (so every hop on the way will also be able to read them).
-    \item[Question 4:] 
-    \item[Question 5:] 
-    \item[Question 6:] 
-    \item[Question 7:] 
-    \item[Question 8:] 
+    \item[Question 4:] No it's not possible to establish a connection. The connection is blocked by a firewall on ask.diku.dk % TODO: use nmap
+    \item[Question 5:]  host = 'localhost', port = 6790. We can communicate this way, because the data sent to port 6790 on our localhost is forwarded to ask.diku.dk on port 6002 though our SSH tunnel.
+    \item[Question 6:] One can again see the messages sent to and from the server in the TCP dump. The data is not encrypted when sent between SSH tunnel and the echoclient, only when going though the SSH tunnel. See \autoref{sub:q6-tcp} for TCP dump.
+
+    \item[Question 7:] One can only see scrampled data by the TCP dump. This is caused by we are monitoring SSH traffic, which is encrypted. SSH runs on port 22. See \autoref{sub:q7-tcp} for TCP dump.
+
+    \item[Question 8:]
+    % client on local ( 52926 ) client SSH tunnel connection ( 52926 <=> 6790 ), magically transformed into 6002 on ask.diku.dk, where the TCP socket for this client has been created at port 35299. -- SSH connection ( 39676 <=> 22 )
+    See \autoref{fig:ssh-q8}.
+    \begin{center}
+    \begin{figure}[H!]
+        \includegraphics[width=0.5\paperwidth]{graphics/ssh-q8.pdf}
+        \caption{\label{fig:ssh-q8}Overview of the connections. Dashes lines represents encrypted messages}
+    \end{figure}
+    \end{center}
 \end{description}
