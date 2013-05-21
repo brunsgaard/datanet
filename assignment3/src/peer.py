@@ -146,6 +146,8 @@ class ChatPeer:
 
             self.send_message(receiver,' '.join(tokens[2:]))
 
+        elif tokens[0] == "/all" and len(tokens) >= 2:
+            self.broadcast(' '.join(tokens[1:]))
 
         elif tokens[0] == "/nick" and len(tokens) == 2:
             if ',' in tokens[1]:
@@ -223,7 +225,7 @@ class ChatPeer:
         return kwargs
 
 
-    def print_users(self):
+    def print_users(self, pp=True):
         """
         Get the list of online users and print it using nice formating
         """
@@ -246,15 +248,18 @@ class ChatPeer:
         self.s['ns'].setblocking(1)
 
         tokens = full_response.split()
-        print tokens
 
         if tokens[0] == "300":
-            print "%s - You" % self.nick
+            if pp:
+                print "%s - You" % self.nick
 
             users = " ".join(tokens[3:]).split(",")
 
-            for user in users:
-                print " - ".join( user.strip().split() )
+            if pp:
+                for user in users:
+                    print " - ".join( user.strip().split() )
+
+            return users
 
         elif tokens[0] == "301":
             print "%s - You" % self.nick
@@ -392,11 +397,16 @@ class ChatPeer:
         Broadcast a message to all users in the system. Establishing
         connections to peers is also a part of this function.
         """
-        # Here you should first make sure that you have established a
-        # connection to all peers on the system.
-        # When these connections are obtained, you should send the message
-        # to every peer like you would send a regular message.
-        pass
+
+        users = self.print_users(pp=False)
+
+        for user in users:
+            if user.split()[0] not in self.s:
+                kwargs = self.lookup_peer(user.split()[0])
+                self.connect_to_peer(**kwargs)
+
+        for user in users:
+            self.send_message(user.split()[0], msg)
 
     def setup_listening_socket(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -408,7 +418,7 @@ class ChatPeer:
         for port in ports:
             try:
                 s.bind(('localhost', port))
-                print('listen on port %i' % port)
+                print('Hello, This chat client is listening on port %i' % port)
                 break
             except socket.error as ex:
                 if ex.errno == errno.EADDRINUSE:
