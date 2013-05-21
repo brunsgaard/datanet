@@ -73,7 +73,8 @@ class ChatNameServer:
 
         tokens = request.split()
 
-        if len(tokens) != 3 or tokens[0] != "HELLO":
+        if len(tokens) != 3 or tokens[0] != "HELLO"\
+           or int(tokens[2]) < 1 or int(tokens[2]) >= 65535:
             sock.sendall("102 HANDSHAKE EXPECTED")
             self.logger.info("not enough info for handshake %s" % str(sock.getpeername()) )
             self.close_clientsock(sock)
