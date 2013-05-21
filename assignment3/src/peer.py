@@ -165,6 +165,9 @@ class ChatPeer:
             self.send_message(receiver,' '.join(tokens[2:]))
 
         elif tokens[0] == "/all" and len(tokens) >= 2:
+            if not self.s['ns']:
+                print('Error: You have to be connected to the ns, to use /all')
+                return
             self.broadcast(' '.join(tokens[1:]))
 
         elif tokens[0] == "/nick" and len(tokens) == 2:
