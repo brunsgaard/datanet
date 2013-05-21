@@ -86,13 +86,13 @@
     \item[Question 2:] The port number appears in both established sockets because it is in the source of the client's
         socket, and the destination of the server's socket (TCP if full duplex, so there is a connection in both directions).
         The port number was chosen randomly as the port for the client's outgoing connection.
-    \item[Question 3:] One can see all messages sent to and from the server in the TCP dump. This is because they are sent. See \autoref{sub:q3-tcp} for TCP dump.
-        unencrypted over the network (so every hop on the way will also be able to read them).
+    \item[Question 3:] One can see all messages sent to and from the server in the TCP dump. This is because they are sent
+        unencrypted over the network (so every hop on the way will also be able to read them). See \autoref{sub:q3-tcp} for TCP dump.
     \item[Question 4:] No it's not possible to establish a connection. The connection is blocked by a firewall on ask.diku.dk % TODO: use nmap
     \item[Question 5:]  host = 'localhost', port = 6790. We can communicate this way, because the data sent to port 6790 on our localhost is forwarded to ask.diku.dk on port 6002 though our SSH tunnel.
     \item[Question 6:] One can again see the messages sent to and from the server in the TCP dump. The data is not encrypted when sent between SSH tunnel and the echoclient, only when going though the SSH tunnel. See \autoref{sub:q6-tcp} for TCP dump.
 
-    \item[Question 7:] One can only see scrampled data by the TCP dump. This is caused by we are monitoring SSH traffic, which is encrypted. SSH runs on port 22. See \autoref{sub:q7-tcp} for TCP dump.
+    \item[Question 7:] One can only see scrambled data in the TCP dump. This is because the SSH traffic is encrypted. SSH runs on port 22. See \autoref{sub:q7-tcp} for TCP dump.
 
     \item[Question 8:]
     % client on local ( 52926 ) client SSH tunnel connection ( 52926 <=> 6790 ), magically transformed into 6002 on ask.diku.dk, where the TCP socket for this client has been created at port 35299. -- SSH connection ( 39676 <=> 22 )
