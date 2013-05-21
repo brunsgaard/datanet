@@ -12,6 +12,9 @@ $B$ to fail when trying to connect.
 In the case the cilents send their public ip addresses, the communication will
 go like this.
 
+The above assumes that NAT translation will in some magic way, know how to
+map the clients listening port the local clint ip.
+
 \begin{lstlisting}
 peer A (alice) <--> ns: HELLO alice alice_port
 ns  <--> peer A (alice): 100 CONNECTED
