@@ -100,6 +100,7 @@ class ChatPeer:
             print "Closing connection"
 
         self.s['ns'].close()
+        self.s['ns'] = None
 
     def read_from_ns_socket(self):
         server_msg = self.s['ns'].recv(self.BUFFERSIZE)
@@ -140,9 +141,26 @@ class ChatPeer:
         elif tokens[0] == "/msg" and len(tokens) >= 3:
             receiver = tokens[1]
 
+            if not getattr(self,'nick', False):
+                print('You have to set your nick')
+                return
+
+
+            if tokens[1] == self.nick:
+                print('Only crazy people talk to them self')
+                return
+
             if receiver not in self.s:
+                if not self.s['ns']:
+                    print('User not found, are you connected to the name server?')
+                    return
+
                 kwargs = self.lookup_peer(receiver)
-                self.connect_to_peer(**kwargs)
+                if kwargs['status_code'] == 200:
+                    self.connect_to_peer(**kwargs)
+                else:
+                    print('User not found')
+                    return
 
             self.send_message(receiver,' '.join(tokens[2:]))
 
@@ -192,8 +210,7 @@ class ChatPeer:
         if self.s['ns']:
             self.disconnect_from_ns()
 
-        for s in filter(None, self.s.values()):
-            s.close()
+        self.disconnect_from_peers()
 
         sys.exit(0)
 
@@ -354,7 +371,8 @@ class ChatPeer:
         elif len(parts) > 0 and parts[0] == "LEAVE":
             sock.send('400 BYE')
             sock.close()
-            del s.s[self.sock2nick[sock]]
+            print('{0} send leave signal'.format(self.sock2nick[sock]))
+            del self.s[self.sock2nick[sock]]
             del self.sock2nick[sock]
         else:
             print "Unrecognized command '%s' from peer %s ignored" % \
@@ -368,10 +386,16 @@ class ChatPeer:
         # Here you should close the connection to all peers
         # that are currently connected.
         # Remember to send the appropriate leave requests.
-        for k, v in self.sock2nick:
-            s.send('LEAVE')
-            s.close()
-            del self.s[v]
+        for k in self.sock2nick.keys():
+            k.send('LEAVE')
+            response = k.recv(self.BUFFERSIZE)
+
+            if response != "400 BYE":
+                print "Unexpected response from server:%s\n" % response
+                print "Closing connection"
+
+            k.close()
+            del self.s[self.sock2nick[k]]
             del self.sock2nick[k]
 
     def send_message(self, user, msg):
