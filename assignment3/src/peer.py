@@ -18,6 +18,7 @@ class ChatPeer:
         self.s = dict()
         self.s['listening'] = self.setup_listening_socket()
         self.s['ns'] = None
+        self.sock2nick = dict()
 
     def run(self):
 
@@ -25,6 +26,7 @@ class ChatPeer:
             # Print a simple prompt.
             sys.stdout.write('\n> ')
             sys.stdout.flush()
+
 
             ready_read, _, _ = select(filter(None, self.s.values())
                                       + [sys.stdin], [], [])
@@ -39,10 +41,7 @@ class ChatPeer:
                     elif o is self.s['listening']:
                         self.connect_from_peer(o.accept()[0])
                     else:
-                        d =  o.recv(1024)
-                        if not d:
-                            o.close()
-                            del self.s[o]
+                        self.parse_peer_request(o, o.recv(1024))
 
 
                 else:
@@ -131,21 +130,22 @@ class ChatPeer:
             return
 
         if tokens[0] == "/connect" and len(tokens) == 3:
-            if getattr(self, self.nick, None):
+            if not getattr(self, 'nick', None):
                 print "Error: you need to chose a nick name before connecting"
             elif self.s['ns']:
                 print "Error: you are already connected to a name server"
             else:
                 self.connect_to_ns(tokens[1], tokens[2])
 
-        elif tokens[0] == "/msg" and len(tokens) == 3:
+        elif tokens[0] == "/msg" and len(tokens) >= 3:
             receiver = tokens[1]
 
             if receiver not in self.s:
                 kwargs = self.lookup_peer(receiver)
                 self.connect_to_peer(**kwargs)
 
-            self.s[receiver].send(' '.join(tokens[2:]))
+            self.send_message(receiver,' '.join(tokens[2:]))
+
 
         elif tokens[0] == "/nick" and len(tokens) == 2:
             if ',' in tokens[1]:
@@ -271,7 +271,6 @@ class ChatPeer:
         # peer-peer handshake.
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
-            print kwargs
             s.connect(('localhost', kwargs['port']))
         except socket.error as e:
             print "Could not open socket to server"
@@ -279,14 +278,15 @@ class ChatPeer:
             s.close()
             return
 
-        request = "HELLO %s" % kwargs['nick']
+        request = "HELLO %s" % self.nick
 
         s.send(request)
         response = s.recv(self.BUFFERSIZE)
 
         if response == "100 CONNECTED":
             self.s[kwargs['nick']] = s
-            print "Connected"
+            self.sock2nick[s] = kwargs['nick']
+            print "Connected to {0}".format(self.sock2nick[s])
             return
 
         if response == "101 REFUSED":
@@ -303,10 +303,6 @@ class ChatPeer:
         Accept a connection from a connecting peer
         and preform the required handshake
         """
-        #msg = sock.recv(self.BUFFERSIZE)
-        print "connect from peer"
-
-        print 'handshake'
 
         handshake = sock.recv(1024)
         tokens = handshake.split()
@@ -318,8 +314,10 @@ class ChatPeer:
                 if ' '.join(tokens[1:]) in self.s:
                     sock.send('101 REFUSED')
                 else:
+                    self.sock2nick[sock] = ' '.join(tokens[1:])
                     self.s[' '.join(tokens[1:])] = sock
                     sock.send('100 CONNECTED')
+                    print('Connected to {0}').format(self.sock2nick[sock])
                     return
         else:
             sock.send('BAD FORMAT')
@@ -330,24 +328,33 @@ class ChatPeer:
         # Here you need to accept and incoming peer connection
         # and preform the receiver part of the peer-peer handshake.
 
-
-    def parse_peer_request(self, request, sock):
+    def parse_peer_request(self, sock, request):
         """
         Parse a request from a connected peer and preform the appropriate actions
         """
+
+        if not request:
+            sock.close()
+            print('The connection to {0} was closed unexpected'
+                  .format(self.sock2nick[sock]))
+            del self.s[self.sock2nick[sock]]
+            del self.sock2nick[sock]
+            return
+
         parts = request.split()
 
         if len(parts) > 0 and parts[0] == "MSG":
-            # Do the appropriate actions according to the protocol.
-            pass
+            print "{0}: {1}".format(self.sock2nick[sock], ' '.join(parts[1:]))
+            sock.send("200 MSG ACK")
         elif len(parts) > 0 and parts[0] == "LEAVE":
-            # Do the appropriate actions according to the protocol.
-            pass
+            sock.send('400 BYE')
+            sock.close()
+            del s.s[self.sock2nick[sock]]
+            del self.sock2nick[sock]
         else:
             print "Unrecognized command '%s' from peer %s ignored" % \
-                (data, self.socks2nicks[sock])
-            # Remember to send a response indicating bad formating
-
+                (' '.join(parts), self.sock2nick[sock])
+            sock.send("500 BAD FORMAT")
 
     def disconnect_from_peers(self):
         """
@@ -356,15 +363,29 @@ class ChatPeer:
         # Here you should close the connection to all peers
         # that are currently connected.
         # Remember to send the appropriate leave requests.
-        pass
+        for k, v in self.sock2nick:
+            s.send('LEAVE')
+            s.close()
+            del self.s[v]
+            del self.sock2nick[k]
 
     def send_message(self, user, msg):
         """
         Send a message to a peer that is already connected to
         """
-        # Here you should send a message to a connected peer.
-        # Remember to check if you receive a message ack.
-        pass
+        timeout = self.s[user].gettimeout()
+        self.s[user].settimeout(2)
+        self.s[user].send('MSG {0}'.format(msg))
+        try:
+            resp = self.s[user].recv(1024)
+            if not resp == "200 MSG ACK":
+                print('{0} may not have recieved your message'.format(user))
+        except socket.error:
+            pass
+            print('{0} may not have recieved your message'.format(user))
+        finally:
+            self.s[user].settimeout(timeout)
+
 
     def broadcast(self, msg):
         """
@@ -387,7 +408,7 @@ class ChatPeer:
         for port in ports:
             try:
                 s.bind(('localhost', port))
-                print 'listen on port %i' % port
+                print('listen on port %i' % port)
                 break
             except socket.error as ex:
                 if ex.errno == errno.EADDRINUSE:
