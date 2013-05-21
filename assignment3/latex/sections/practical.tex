@@ -1,19 +1,20 @@
 \section{Programming part}
 \subsection{Question 1}
+With the current implementation of the server the connection cannot be made.
 There will be no problem in making a peer-to-peer connection between peer $A$
 and peer $B$, IF and only if the clients takes into account that $A$ is on the
-same host as the name server. (which implies that the clients send their public IP
+same host as the name server (which implies that the clients send their public IP
 address and not the local ip address).
 
 If this is not taken into account, peer $B$ will will lookup $A$ and the name
 server will tell $B$ that $A$ is found at ip 127.0.0.1, which obviously cause
 $B$ to fail when trying to connect.
 
-In the case the cilents send their public ip addresses, the communication will
+In the case the clients send their public ip addresses, the communication will
 go like this.
 
-The above assumes that NAT translation will in some magic way, know how to
-map the clients listening port the local clint ip.
+This assumes that NAT translation will, in some magic way, know how to
+map the clients listening port the local client ip.
 
 \begin{lstlisting}
 peer A (alice) <--> ns: HELLO alice alice_port
@@ -25,7 +26,7 @@ ns  <--> peer A (alice): 200 INFO bob_ip bob_port
 peer A (alice) <--> peer B (bob): HELLO alice
 peer B (bob) <--> peer A (alice): 100 CONNECTED
 
-peer A (alice) <--> peer B (bob): MSG Are you single
+peer A (alice) <--> peer B (bob): MSG asl?
 \end{lstlisting}
 
 \subsection{Question 2}
