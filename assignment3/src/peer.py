@@ -450,7 +450,6 @@ class ChatPeer:
             except socket.error as ex:
                 if ex.errno == errno.EADDRINUSE:
                     continue
-                break
         s.listen(5)
         return s
 
