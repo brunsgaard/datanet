@@ -39,35 +39,18 @@ certain amount of time before they are automatically closed. This way only
 active connections takes up resources in the long run.
 
 \subsection{Question 3}
-We suggest a design where a peer is working as group master, and the name
-server only knows which peer is authorized to act as group master.
+We suggest a design where a new protocol command {\tt GMSG}, that facilitates
+multicast chat, is implemented. This command would carry the message to be sendt
+to the other participants, as well as a list of participants (or an ID of the
+group chat if a setup command is also introduced). To send a group chat message
+a peer would simply send the {\tt GMSG} to all other participants. This way the
+nameserver does not need to hold a register of private group chats.
 
-Other peers would be able to lookup and list the groups on the name server and
-thereafter connect to the groups peer master to get the member list.
-
-The peer working as group master, would then send updates regarding
-member changes to all of its group members(peers joining and leaving the group).
-
-All peers - which are members of the group - will then have an updated list of
-group members and could use a group broadcasting method to send messages to
-other group members.
-
-On the name server we would need the following commands:
-\begin{lstlisting}
-ADDGROUP <groupname>
-DELGROUP <groupname>
-LISTGROUPS <groupname>
-LOOKUPGROUP <groupname>
-\end{lstlisting}
-
-On the peer side we would need these commands:
-\begin{lstlisting}
-ADD_ME_TO_GROUP <nick> <port>
-DEL_ME_FROM_GROUP
-ADD_GROUP_MEMBER <nick> <port>
-DEL_GROUP_MEMBER <nick>
-MSG_GROUP <group> <msg>
-\end{lstlisting}
+With this model group chats would require no handshaking or initialization, and
+could be quickly created and merged. To send a reply the client may be given a
+dynamically generated identifier that corresponds to the group chat. If we require
+lower overhead a {\tt GSETUP} command could be introduced, generating a more static
+but easier to manage group chat.
 
 \subsection{Question 4}
 We can achieve $O(lg(n))$ with flooding. Figure 2, shows how $u0$ is
