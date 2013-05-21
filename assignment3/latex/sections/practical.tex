@@ -1,8 +1,9 @@
 \section{Programming part}
 \subsection{Question 1}
-Yes, there will be no problem in making a peer-to-peer connection between
-peer $A$ and peer $B$.
+There will be no problem in making a peer-to-peer connection between peer $A$
+and peer $B$.
 
+The communication will go like this.
 \begin{lstlisting}
 peer A (alice) <--> ns: HELLO alice alice_port
 ns  <--> peer A (alice): 100 CONNECTED
@@ -17,31 +18,30 @@ peer A (alice) <--> peer B (bob): MSG Are you single
 \end{lstlisting}
 
 \subsection{Question 2}
-It is not prudent to keep unused connections open, it just take up system
-resources. On the other hand connections should be keep open to connections
-that are used often, besacuse the the whole connection and disconnection
-process add a certen overhead to a continuous transmission.
+It is not prudent to keep unused connections open, it just takes up system
+resources. On the other hand connections should be kept open to connections
+that are used frequently (because the whole connection and disconnection
+process add a considerable overhead to short transmissions.
 
-We would suggest implementing a timeout, such that connections are idle only
-for a certen amount of time before they are automaticly closed. This way only
-active connections take up resources in the long run.
-
+We suggest implementing a peer timeout, such that connections only idle for a
+certain amount of time before they are automatically closed. This way only
+active connections takes up resources in the long run.
 
 \subsection{Question 3}
-We suggest a design where a peer is working as group accountend, and the name
+We suggest a design where a peer is working as group master, and the name
 server only knows which peer is authorized to act as group master.
 
-Peers would be able to lookup and list the groups on the name server and
-thereafter connect to the peer hosting the list of group members.
+Other peers would be able to lookup and list the groups on the name server and
+thereafter connect to the groups peer master to get the member list.
 
-The peer working as group master, would then send updates regarding members to
-all of its group members(peers joining and leaving the group).
+The peer working as group master, would then send updates regarding
+member changes to all of its group members(peers joining and leaving the group).
 
 All peers - which are members of the group - will then have an updated list of
-group members and could use use a group-broadcast method to send messages to
-other group memebers.
+group members and could use a group broadcasting method to send messages to
+other group members.
 
-On the name server we would need
+On the name server we would need the following commands:
 \begin{lstlisting}
 ADDGROUP <groupname>
 DELGROUP <groupname>
@@ -49,30 +49,33 @@ LISTGROUPS <groupname>
 LOOKUPGROUP <groupname>
 \end{lstlisting}
 
-On the peer side we would need
+On the peer side we would need these commands:
 \begin{lstlisting}
 ADD_ME_TO_GROUP <nick> <port>
 DEL_ME_FROM_GROUP
-
 ADD_GROUP_MEMBER <nick> <port>
 DEL_GROUP_MEMBER <nick>
-
 MSG_GROUP <group> <msg>
 \end{lstlisting}
 
 \subsection{Question 4}
-We can achieve this with flooding. Figure 2, shows how $u0$ is broadcasting to the rest of the network
-consistng of $u1,u2,u3,u4,u5,u6$.
+We can achieve $O(lg(n))$ with flooding. Figure 2, shows how $u0$ is
+broadcasting to the rest of the network consisting of the peers
+$u1,u2,u3,u4,u5,u6$.
 
-$u0$ takes the broadcast-list and splits it in half, then $u0$ sends the message
-and the remaining of the two new half broadcasting lists (the reciever is subtracted) to first
-member of the lists.
+$u0$ takes the broadcast-list and splits it in half, then $u0$ sends the
+message and one of the new half broadcasting lists (the receiver
+is subtracted) to the first member of the lists.
 
-This implies that $u1$ will get the message and the broadcast list $u2, u3$ and $u4$ will get the message and the list $u5,u6$.
+This implies that $u1$ will get the message and the broadcast list $u2, u3$.
 
-$u1$ splits the remaning list in two and because each list now only contains
-one peer, only the message is send to $u2$ and $u3$. The exact same procedure
-is followed by $u4$. As mentioned above a graphical illustration is shown in Figure 2.
+$u4$ will also get the message, but will get the other half broadcasting list,
+containing  $u5,u6$.
+
+$u1$ again splits the remaining list in two and because each list now only
+contains one peer, only the message is send to $u2$ and $u3$. The exact same
+procedure is followed by $u4$. As mentioned above a graphical illustration is
+shown in Figure 2.
 
 \begin{figure}[!h]
     \centering
@@ -80,6 +83,12 @@ is followed by $u4$. As mentioned above a graphical illustration is shown in Fig
     \caption{Flooding messages}
 \end{figure}
 
-
-
-\subsection{Name Server Extentions}
+\subsection{Question 5}
+In regard to the name server we need the confirmation to assure that the name
+server indeed removed the peer from the userlist. Even though all packages are
+transmitted, the TCP protocol will not help us in case of an internal server
+error etc. In that regard a missing BYE from the server tells us, that
+something unexpected happened.
+The same is true for the MSG ACK, this also assure us that the recipient not
+only received the message, but also that it was in fact delivered to the
+receivers output device.
